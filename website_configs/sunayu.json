@@ -1,0 +1,31 @@
+{
+    "URL":"https://sunayu.bamboohr.com/careers/",
+
+    "page_elements":
+        {
+            
+        },
+
+    "fields": 
+        {
+            "Opened Date":"",
+            "Requisition ID":"",
+            "LCAT":"Category",
+            "Status":"Open",
+            "TTO Lead Name":"",
+            "TTO Lead Email":"",
+            "Clearance":"Clearance",
+            "Reason for Opening":"",
+            "Location":"Location",
+            "Travel":"Travel Required",
+            "TTO Number":"",
+            "Full/Part Time":"Employment Type",
+            "Legacy Department":"",
+            "Opening Type":"Remote Type",
+            "Need by Date":"",
+            "Project Name":"",
+            "Labor Category":"",
+            "Description":"Description",
+            "Requirements":"Requirements"
+        }
+}
