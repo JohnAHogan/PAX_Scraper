@@ -8,7 +8,6 @@ import scrapy
 import os
 from scrapy.http import TextResponse
 from scrapy.selector import Selector
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
@@ -21,7 +20,6 @@ def wait(driver, xpath, duration=10):
     element = WebDriverWait(driver, duration).until(
         EC.visibility_of_element_located((By.XPATH, xpath))
     )
-
     return element
 
 def wait_and_click(driver, xpath, duration=10):
@@ -68,7 +66,7 @@ def lockheed(driver, spreadsheet, webconfig_data):
     action.move_to_element(dropdown).perform()
 
     time.sleep(3)
-    links = driver.find_elements_by_xpath(xpath['hrefs'])
+    links = driver.find_elements(By.XPATH, xpath['hrefs'])
     hrefs = [el.get_attribute('href') for el in links]
 
     for href in hrefs:
@@ -84,10 +82,15 @@ def sunayu(driver, spreadsheet, webconfig_data):
     all_responses = []
     xpath = webconfig_data['page_elements']
     driver.get(webconfig_data['URL'])
-    links = driver.find_elements_by_xpath(xpath['hrefs'])
-    print(links)
-    hrefs = [el.get_attribute('href') for el in links]
-    print(hrefs)
+    wait(driver, xpath['careers']) #ensures page text loads.
+    links = driver.find_elements(By.XPATH, xpath['careers'])
+    job_posting = [el.get_attribute('href') for el in links]
+    if not any(char.isdigit() for char in job_posting[0]):
+        del job_posting[0] # link to root, we don't need this
+    for href in job_posting:
+        driver.get(href)
+        wait(driver, "//input[@type='button']")
+
     return 0
 
 
@@ -103,10 +106,10 @@ def main():
     driver = webdriver.Firefox()
     workbook = Workbook()
     
-    sheet = wb.add_sheet('Sunayu_Raw')
-    with open('website_configs/sunayu.json') as file:
-        webconfig_data = json.load(file)
-    sunayu(driver, sheet, webconfig_data)
+    # sheet = wb.add_sheet('Sunayu_Raw')
+    # with open('website_configs/sunayu.json') as file:
+    #     webconfig_data = json.load(file)
+    # sunayu(driver, sheet, webconfig_data)
     
     for file in os.listdir("website_configs/"):
         filename = os.fsdecode(file)
@@ -115,7 +118,7 @@ def main():
             if "lockheed" in filename:
                 continue # lockheed(driver, workbook.add_sheet('lockheed'), json.load(file))
             elif "sunayu" in filename:
-                sunayu(driver, workbook.add_sheet('sunayu'), json.load(file))
+                sunayu(driver, workbook.add_sheet('sunayu'), json.load(open("website_configs/sunayu.json")))
             else:
                 print(f"Unable to find scraping algorithm for {filename}")
         else:
@@ -125,7 +128,7 @@ def main():
 
 
     driver.quit()
-    wb.save('artius.csv')
+    workbook.save('artius.xls')
 
 if __name__ == '__main__':
     main()
