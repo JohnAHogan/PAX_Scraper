@@ -36,8 +36,7 @@ def load_fields(json_fields):
 
 def remove_between(text, start_delimiter, end_delimiter):
     pattern = re.escape(start_delimiter) + ".*?" + re.escape(end_delimiter)
-    return re.sub(pattern, "", text)
-    # re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", x)
+    return re.sub(pattern, start_delimiter+end_delimiter, text)
 
 # A bit of a caveman solution but it defeats the parsons website which infiniscrolls.
 # Scroll to bottom of the page, if inifiniscroll is too deep we give up.
@@ -78,6 +77,16 @@ def get_text_excluding_children(driver, element):
         return ret;
         """, element)
 
+def clean_out_markup(marked_text):
+    list = remove_between(marked_text, '<','>').split('<>') #clears out tags
+    # print(list)
+    while '' in list:
+        list.remove('') #remove empty lines
+    for index, item in enumerate(list):
+        #I can't oneline this and it's killing me. A better python dev might be able to save it.
+        item = item.replace("&nbsp;","") # remove nonbreaking space characters
+        list[index] = item 
+    return list
 
 ##################################################### Page Specific functions #####################################################
 
@@ -116,17 +125,18 @@ def sunayu(driver, spreadsheet, webconfig_data):
 
     links = driver.find_elements(By.XPATH, xpath['careers'])
     job_postings = [el.get_attribute('href') for el in links]
-
+    results = []
     if not any(char.isdigit() for char in job_postings[0]):
         del job_postings[0] # link to root, we don't need this
     for href in job_postings:
         driver.get(href)
         wait(driver, "descriptionWrapper", By.ID)
-        raw_lines = driver.find_element(By.ID, "descriptionWrapper").get_attribute("innerHTML").text
-        print(raw_lines)
-        # for index,line in enumerate(raw_lines):
-            # print(f"\nLine#{index}\n{line}")
-        quit
+        raw_lines = driver.find_element(By.ID, "descriptionWrapper").get_attribute("innerHTML")
+        # print(raw_lines)
+        for raw_line in raw_lines:
+            results += clean_out_markup(raw_line)
+        # print(results)
+        # quit()
     return 0
 
 # Lots of room for improvement here. Ideas from worst to best:
@@ -157,14 +167,14 @@ def main():
         filename = os.fsdecode(file)
         if filename.endswith(".json"):
             print("Scraping using file: " + os.path.join("website_configs/", filename))
-            if "lockheed" in filename:
-                continue 
-                lockheed(driver, workbook.add_sheet('lockheed'), json.load(file))
-            elif "sunayu" in filename:
+            if "sunayu" in filename:
                 sunayu(driver, workbook.add_sheet('sunayu'), json.load(open("website_configs/sunayu.json")))
             elif "parsons" in filename:
-                continue
+                # continue
                 parsons(driver, workbook.add_sheet('parsons'), json.load(open("website_configs/parsons.json")))
+            elif "lockheed" in filename:
+                continue 
+                lockheed(driver, workbook.add_sheet('lockheed'), json.load(open("website_configs/parsons.json")))
             else:
                 print(f"Unable to find scraping algorithm for {filename}")
         else:
