@@ -59,6 +59,19 @@ def write_to_sheet(response_data, sheet_tab, fields):
 
             sheet_tab.write(row, col, content)
 
+def get_text_excluding_children(driver, element):
+    return driver.execute_script("""
+        var parent = arguments[0];
+        var child = parent.firstChild;
+        var ret = "";
+        while(child) {
+            if (child.nodeType === Node.TEXT_NODE)
+                ret += child.textContent;
+            child = child.nextSibling;
+        }
+        return ret;
+        """, element)
+
 
 ##################################################### Page Specific functions #####################################################
 
@@ -94,14 +107,18 @@ def sunayu(driver, spreadsheet, webconfig_data):
     xpath = webconfig_data['page_elements']
     driver.get(webconfig_data['URL'])
     wait(driver, xpath['careers']) #ensures page text loads.
-    links = driver.find_elements(By.XPATH, xpath['careers'])
-    job_posting = [el.get_attribute('href') for el in links]
-    if not any(char.isdigit() for char in job_posting[0]):
-        del job_posting[0] # link to root, we don't need this
-    for href in job_posting:
-        driver.get(href)
-        wait(driver, "//input[@type='button']") 
 
+    links = driver.find_elements(By.XPATH, xpath['careers'])
+    job_postings = [el.get_attribute('href') for el in links]
+
+    if not any(char.isdigit() for char in job_postings[0]):
+        del job_postings[0] # link to root, we don't need this
+    for href in job_postings:
+        driver.get(href)
+        time.sleep(1)
+        for line in driver.find_element(By.ID, "descriptionWrapper").get_attribute("innerHTML").splitlines():
+            print(line)
+        quit
     return 0
 
 # Lots of room for improvement here. Ideas from worst to best:
