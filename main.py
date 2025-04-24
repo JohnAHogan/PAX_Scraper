@@ -33,6 +33,17 @@ def load_fields(json_fields):
             fields.append(value)
     return fields
 
+# A bit of a caveman solution but it defeats the parsons website which infiniscrolls.
+# Scroll to bottom of the page, if inifiniscroll is too deep instead quit out.
+def infiniscroll_to_bottom(driver):
+    for i in range(20):
+        old_height = driver.execute_script("return document.body.scrollHeight")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(0.5)
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == old_height:
+            break
+
 def write_to_sheet(response_data, sheet_tab, fields):
     for col, field_name in enumerate(fields):
         # worksheet.write(0, col, field_name)
@@ -89,10 +100,20 @@ def sunayu(driver, spreadsheet, webconfig_data):
         del job_posting[0] # link to root, we don't need this
     for href in job_posting:
         driver.get(href)
-        wait(driver, "//input[@type='button']")
+        wait(driver, "//input[@type='button']") 
 
     return 0
 
+# Lots of room for improvement here. Ideas from worst to best:
+# 1: Can enhance speed some (whatever)
+# 2: Pulls all jobs globally. Not ideal. filter DMV only somehow.
+# 3: Job data comes out super weird. 
+def parsons(driver, spreadsheet, webconfig_data):
+    driver.get(webconfig_data['URL'])
+    time.sleep(3) # can't figure out how to load page properly, caveman wait only
+    infiniscroll_to_bottom(driver)
+    xpath = webconfig_data['page_elements']
+    links = driver.find_elements(By.XPATH, xpath['careers'])
 
 ##################################################### Main Method #####################################################
 
@@ -106,19 +127,18 @@ def main():
     driver = webdriver.Firefox()
     workbook = Workbook()
     
-    # sheet = wb.add_sheet('Sunayu_Raw')
-    # with open('website_configs/sunayu.json') as file:
-    #     webconfig_data = json.load(file)
-    # sunayu(driver, sheet, webconfig_data)
-    
     for file in os.listdir("website_configs/"):
         filename = os.fsdecode(file)
         if filename.endswith(".json"):
             print("Scraping using file: " + os.path.join("website_configs/", filename))
             if "lockheed" in filename:
-                continue # lockheed(driver, workbook.add_sheet('lockheed'), json.load(file))
+                continue 
+                lockheed(driver, workbook.add_sheet('lockheed'), json.load(file))
             elif "sunayu" in filename:
                 sunayu(driver, workbook.add_sheet('sunayu'), json.load(open("website_configs/sunayu.json")))
+            elif "parsons" in filename:
+                continue
+                parsons(driver, workbook.add_sheet('parsons'), json.load(open("website_configs/parsons.json")))
             else:
                 print(f"Unable to find scraping algorithm for {filename}")
         else:
