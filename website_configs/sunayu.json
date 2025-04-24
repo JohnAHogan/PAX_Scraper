@@ -5,6 +5,7 @@
         {
             "careers": "//a[contains(@href,\"careers\")]",
             "detail_loaded": "//td[contains(text(),\"Requisition Information:\")]"
+            
         },
 
     "fields": 

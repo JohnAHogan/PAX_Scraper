@@ -2,6 +2,7 @@
 import q
 import time
 import xlwt
+import re
 from xlwt import Workbook
 import json
 import scrapy
@@ -16,14 +17,14 @@ from selenium.webdriver.support import expected_conditions as EC
 
 ##################################################### Helper Functions #####################################################
 
-def wait(driver, xpath, duration=10):
+def wait(driver, identifier, mode=By.XPATH, duration=10):
     element = WebDriverWait(driver, duration).until(
-        EC.visibility_of_element_located((By.XPATH, xpath))
+        EC.visibility_of_element_located((mode, identifier))
     )
     return element
 
-def wait_and_click(driver, xpath, duration=10):
-    element = wait(driver, xpath, duration)
+def wait_and_click(driver, identifier,mode=By.XPATH, duration=10):
+    element = wait(driver, identifier, mode, duration)
     element.click()
 
 def load_fields(json_fields):
@@ -33,8 +34,13 @@ def load_fields(json_fields):
             fields.append(value)
     return fields
 
+def remove_between(text, start_delimiter, end_delimiter):
+    pattern = re.escape(start_delimiter) + ".*?" + re.escape(end_delimiter)
+    return re.sub(pattern, "", text)
+    # re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", x)
+
 # A bit of a caveman solution but it defeats the parsons website which infiniscrolls.
-# Scroll to bottom of the page, if inifiniscroll is too deep instead quit out.
+# Scroll to bottom of the page, if inifiniscroll is too deep we give up.
 def infiniscroll_to_bottom(driver):
     for i in range(20):
         old_height = driver.execute_script("return document.body.scrollHeight")
@@ -115,14 +121,16 @@ def sunayu(driver, spreadsheet, webconfig_data):
         del job_postings[0] # link to root, we don't need this
     for href in job_postings:
         driver.get(href)
-        time.sleep(1)
-        for line in driver.find_element(By.ID, "descriptionWrapper").get_attribute("innerHTML").splitlines():
-            print(line)
+        wait(driver, "descriptionWrapper", By.ID)
+        raw_lines = driver.find_element(By.ID, "descriptionWrapper").get_attribute("innerHTML").text
+        print(raw_lines)
+        # for index,line in enumerate(raw_lines):
+            # print(f"\nLine#{index}\n{line}")
         quit
     return 0
 
 # Lots of room for improvement here. Ideas from worst to best:
-# 1: Can enhance speed some (whatever)
+# 1: Can enhance speed some
 # 2: Pulls all jobs globally. Not ideal. filter DMV only somehow.
 # 3: Job data comes out super weird. 
 def parsons(driver, spreadsheet, webconfig_data):
@@ -131,6 +139,7 @@ def parsons(driver, spreadsheet, webconfig_data):
     infiniscroll_to_bottom(driver)
     xpath = webconfig_data['page_elements']
     links = driver.find_elements(By.XPATH, xpath['careers'])
+    job_postings = [el.get_attribute('href') for el in links]
 
 ##################################################### Main Method #####################################################
 
