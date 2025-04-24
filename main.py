@@ -85,6 +85,7 @@ def clean_out_markup(marked_text):
     for index, item in enumerate(list):
         #I can't oneline this and it's killing me. A better python dev might be able to save it.
         item = item.replace("&nbsp;","") # remove nonbreaking space characters
+        item = item.replace('u200b',"")
         list[index] = item 
     return list
 
@@ -117,26 +118,30 @@ def lockheed(driver, spreadsheet, webconfig_data):
 
     write_to_sheet(spreadsheet, all_responses)
 
-def sunayu(driver, spreadsheet, webconfig_data):
-    all_responses = []
-    xpath = webconfig_data['page_elements']
-    driver.get(webconfig_data['URL'])
-    wait(driver, xpath['careers']) #ensures page text loads.
+def process_data(raw_data, website_fields):
+    print(website_fields.keys())
+    return 0
 
-    links = driver.find_elements(By.XPATH, xpath['careers'])
+def sunayu(driver, spreadsheet, webconfig_data):
+    crude_job_data = []
+    page_elements = webconfig_data['page_elements']
+    process_data(0, webconfig_data['fields'])
+    quit()
+    driver.get(webconfig_data['URL'])
+    wait(driver, page_elements['careers']) #ensures page text loads.
+
+    links = driver.find_elements(By.XPATH, page_elements['careers'])
     job_postings = [el.get_attribute('href') for el in links]
-    results = []
     if not any(char.isdigit() for char in job_postings[0]):
         del job_postings[0] # link to root, we don't need this
     for href in job_postings:
         driver.get(href)
-        wait(driver, "descriptionWrapper", By.ID)
-        raw_lines = driver.find_element(By.ID, "descriptionWrapper").get_attribute("innerHTML")
-        # print(raw_lines)
+        wait(driver, page_elements['textbox'], By.ID)
+        raw_lines = driver.find_element(By.ID, page_elements['textbox']).get_attribute("innerHTML").splitlines()
         for raw_line in raw_lines:
-            results += clean_out_markup(raw_line)
-        # print(results)
-        # quit()
+            crude_job_data += clean_out_markup(raw_line)
+        write_to_sheet(process_data(crude_job_data, webconfig_data['fields']), spreadsheet, webconfig_data['fields'])
+        quit()
     return 0
 
 # Lots of room for improvement here. Ideas from worst to best:
@@ -168,9 +173,10 @@ def main():
         if filename.endswith(".json"):
             print("Scraping using file: " + os.path.join("website_configs/", filename))
             if "sunayu" in filename:
+                # continue
                 sunayu(driver, workbook.add_sheet('sunayu'), json.load(open("website_configs/sunayu.json")))
             elif "parsons" in filename:
-                # continue
+                continue
                 parsons(driver, workbook.add_sheet('parsons'), json.load(open("website_configs/parsons.json")))
             elif "lockheed" in filename:
                 continue 
@@ -178,7 +184,7 @@ def main():
             else:
                 print(f"Unable to find scraping algorithm for {filename}")
         else:
-            print("Error decoding file type, issue with json values. Something funny is happening?")
+            print(f"Error decoding file type for file {filename}, issue with json values. Something funny is happening?")
             continue
 
 
