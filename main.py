@@ -1,53 +1,17 @@
 
-import q
-import time
-import xlwt
-import re
-from xlwt import Workbook
-import json
-import scrapy
-import os
-from scrapy.http import TextResponse
-from scrapy.selector import Selector
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import q, time, xlwt, re, json, scrapy, os # type: ignore
+from xlwt import Workbook # type: ignore
+import Sunayu
+import Website
+from scrapy.http import TextResponse# type: ignore
+from scrapy.selector import Selector# type: ignore
+from selenium import webdriver # type: ignore
+from selenium.webdriver.common.by import By # type: ignore
+from selenium.webdriver.common.action_chains import ActionChains # type: ignore
+from selenium.webdriver.support.ui import WebDriverWait # type: ignore
+from selenium.webdriver.support import expected_conditions as EC # type: ignore
 
 ##################################################### Helper Functions #####################################################
-
-def wait(driver, identifier, mode=By.XPATH, duration=10):
-    element = WebDriverWait(driver, duration).until(
-        EC.visibility_of_element_located((mode, identifier))
-    )
-    return element
-
-def wait_and_click(driver, identifier,mode=By.XPATH, duration=10):
-    element = wait(driver, identifier, mode, duration)
-    element.click()
-
-def load_fields(json_fields):
-    fields = []
-    for key, value in json_fields.items():
-        if value != "":
-            fields.append(value)
-    return fields
-
-def remove_between(text, start_delimiter, end_delimiter):
-    pattern = re.escape(start_delimiter) + ".*?" + re.escape(end_delimiter)
-    return re.sub(pattern, start_delimiter+end_delimiter, text)
-
-# A bit of a caveman solution but it defeats the parsons website which infiniscrolls.
-# Scroll to bottom of the page, if inifiniscroll is too deep we give up.
-def infiniscroll_to_bottom(driver):
-    for i in range(20):
-        old_height = driver.execute_script("return document.body.scrollHeight")
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(0.5)
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == old_height:
-            break
 
 def write_to_sheet(response_data, sheet_tab, fields):
     for col, field_name in enumerate(fields):
@@ -64,28 +28,17 @@ def write_to_sheet(response_data, sheet_tab, fields):
 
             sheet_tab.write(row, col, content)
 
-def get_text_excluding_children(driver, element):
-    return driver.execute_script("""
-        var parent = arguments[0];
-        var child = parent.firstChild;
-        var ret = "";
-        while(child) {
-            if (child.nodeType === Node.TEXT_NODE)
-                ret += child.textContent;
-            child = child.nextSibling;
-        }
-        return ret;
-        """, element)
 
+# Cleans out HTML markup data. When seperating out the split data, returns in form of array of strings.
+# Also removes 'invisible' chars because python does not understand them.
 def clean_out_markup(marked_text):
-    list = remove_between(marked_text, '<','>').split('<>') #clears out tags
+    list = Website.remove_between(marked_text, '<','>').split('<>') #clears out tags
     # print(list)
     while '' in list:
         list.remove('') #remove empty lines
     for index, item in enumerate(list):
-        #I can't oneline this and it's killing me. A better python dev might be able to save it.
-        item = item.replace("&nbsp;","") # remove nonbreaking space characters
-        item = item.replace('u200b',"")
+        item = item.replace("&nbsp;","") # nonbreaking space
+        item = item.replace('u200b',"") 
         list[index] = item 
     return list
 
@@ -118,17 +71,13 @@ def lockheed(driver, spreadsheet, webconfig_data):
 
     write_to_sheet(spreadsheet, all_responses)
 
-def process_data(raw_data, website_fields):
-    print(website_fields.keys())
-    return 0
-
-def sunayu(driver, spreadsheet, webconfig_data):
+def Sunayu(driver, spreadsheet, webconfig_data):
     crude_job_data = []
     page_elements = webconfig_data['page_elements']
-    process_data(0, webconfig_data['fields'])
-    quit()
+    process_data([], webconfig_data['fields'])
+    # quit()
     driver.get(webconfig_data['URL'])
-    wait(driver, page_elements['careers']) #ensures page text loads.
+    Website.wait(driver, page_elements['careers']) #ensures page text loads.
 
     links = driver.find_elements(By.XPATH, page_elements['careers'])
     job_postings = [el.get_attribute('href') for el in links]
@@ -136,7 +85,7 @@ def sunayu(driver, spreadsheet, webconfig_data):
         del job_postings[0] # link to root, we don't need this
     for href in job_postings:
         driver.get(href)
-        wait(driver, page_elements['textbox'], By.ID)
+        Website.wait(driver, page_elements['textbox'], By.ID)
         raw_lines = driver.find_element(By.ID, page_elements['textbox']).get_attribute("innerHTML").splitlines()
         for raw_line in raw_lines:
             crude_job_data += clean_out_markup(raw_line)
@@ -162,25 +111,29 @@ def main():
 
     with open('website_configs/lockheed.json') as file:
         webconfig_data = json.load(file)
-
     all_responses = []
 
     driver = webdriver.Firefox()
     workbook = Workbook()
+
+    folder_prefix=  "website_configs/"
     
-    for file in os.listdir("website_configs/"):
+    for file in os.listdir(folder_prefix):
         filename = os.fsdecode(file)
+        website
         if filename.endswith(".json"):
-            print("Scraping using file: " + os.path.join("website_configs/", filename))
+            full_path = os.path.join(folder_prefix, filename)
+            print("Scraping using file: " + full_path)
             if "sunayu" in filename:
                 # continue
-                sunayu(driver, workbook.add_sheet('sunayu'), json.load(open("website_configs/sunayu.json")))
+                # sunayu(driver, workbook.add_sheet('sunayu'), json.load(open(full_path)))
+                website = Sunayu.Sunayu(driver, workbook.add_sheet('sunayu'), json.load(open(full_path)))
             elif "parsons" in filename:
                 continue
-                parsons(driver, workbook.add_sheet('parsons'), json.load(open("website_configs/parsons.json")))
+                parsons(driver, workbook.add_sheet('parsons'), json.load(open(full_path)))
             elif "lockheed" in filename:
                 continue 
-                lockheed(driver, workbook.add_sheet('lockheed'), json.load(open("website_configs/parsons.json")))
+                lockheed(driver, workbook.add_sheet('lockheed'), json.load(open(full_path)))
             else:
                 print(f"Unable to find scraping algorithm for {filename}")
         else:
