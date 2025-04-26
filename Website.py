@@ -1,5 +1,14 @@
 from selenium.webdriver.support.ui import WebDriverWait # type: ignore
 import re
+import xlwt;
+from scrapy.http import TextResponse# type: ignore
+from scrapy.selector import Selector# type: ignore
+from selenium import webdriver # type: ignore
+from selenium.webdriver.common.by import By # type: ignore
+from selenium.webdriver.common.action_chains import ActionChains # type: ignore
+from selenium.webdriver.support.ui import WebDriverWait # type: ignore
+from selenium.webdriver.support import expected_conditions as EC # type: ignore
+
 
 class Website:
 
@@ -7,6 +16,7 @@ class Website:
         self.driver = driver
         self.spreadsheet = spreadsheet
         self.webconfig_data = webconfig_data
+        self.page_elements = webconfig_data['page_elements']
 
 ##################################################### Selenium Helper Methods #####################################################
 
@@ -62,3 +72,33 @@ def process_data(raw_data, website_fields):
         delimiter = website_fields[field]
         print(f"{field}: {Website.find_data(raw_data, delimiter)}")
     return ""
+
+# Cleans out HTML markup data. When seperating out the split data, returns in form of array of strings.
+# Also removes 'invisible' chars because python does not understand them.
+def clean_out_markup(marked_text):
+    list = Website.remove_between(marked_text, '<','>').split('<>') #clears out tags
+    # print(list)
+    while '' in list:
+        list.remove('') #remove empty lines
+    for index, item in enumerate(list):
+        item = item.replace("&nbsp;","") # nonbreaking space
+        item = item.replace('u200b',"") 
+        list[index] = item 
+    return list
+
+##################################################### Spreadsheet Methods #####################################################
+
+def write_to_sheet(self, response_data):
+    for col, field_name in enumerate(fields):
+        # worksheet.write(0, col, field_name)
+        sheet_tab.write(0, col, field_name)
+    # for row, response in enumerate(fields, start=1):
+    #     for col, field in enumerate(fields):
+    #         xpath = special_xpath.get(field, standard_xpath(field))
+    #         selector = response.xpath(xpath)
+    #         if field in big_fields:
+    #             content = '\n'.join(selector.extract())
+    #         else:
+    #             content = selector.extract_first()
+
+    #         sheet_tab.write(row, col, content)
