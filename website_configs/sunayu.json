@@ -26,7 +26,11 @@
             "Need by Date":"",
             "Project Name":"",
             "Labor Category":"",
-            "Description":"<multiline>Description",
-            "Requirements":"<multiline>Requirements"
+            "Description":"<multiline>Job Summary",
+            "Description1":"<multiline>Key Responsibilities",
+            "Description2":"<multiline>Primary Responsibilities",
+            "Requirements":"<multiline>Position Requirements",
+            "Requirements1":"<multiline>Preferred Certifications",
+            "Requirements2":"<multiline>Qualifications"
         }
 }

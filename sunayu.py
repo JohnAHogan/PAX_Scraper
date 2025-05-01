@@ -1,20 +1,19 @@
-import Website
-from selenium import webdriver # type: ignore
-from selenium.webdriver.common.by import By # type: ignore
-from selenium.webdriver.common.action_chains import ActionChains # type: ignore
-from selenium.webdriver.support import expected_conditions as EC # type: ignore
+import website
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
 
 
 
-class Sunayu(Website.Website):
-    
+class Sunayu(website.Website):
+
     #process through the website pages, format data, write to sheet
     def process(self):
         job_postings = self.get_job_postings()
-        for job_page in job_postings:
+        for index, job_page in enumerate(job_postings):
             job_data = self.process_job_page(job_page)
-            # self.write_to_sheet(self.process_data(plaintext_job_data))
-            quit()
+            self.write_to_sheet(index, job_data)
         return 0
     
     #Iterates through all the website pages
@@ -29,10 +28,14 @@ class Sunayu(Website.Website):
             del job_postings[0] # link to root, we don't need this
         return job_postings
     
+
     def process_job_page(self, job_page):
         self.driver.get(job_page)
         self.wait(self.page_elements['textbox'], By.ID) #ensure page text loads
-
+        plaintext_job_data = []
         raw_lines = self.driver.find_element(By.ID, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()
         for raw_line in raw_lines:
-            plaintext_job_data += self.clean_out_markup(raw_line)
+            plaintext_job_data += Sunayu.clean_out_markup(raw_line)
+        job_data = self.process_data(plaintext_job_data)
+        print(job_data)
+        return plaintext_job_data
