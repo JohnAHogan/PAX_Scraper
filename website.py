@@ -1,13 +1,7 @@
-from selenium.webdriver.support.ui import WebDriverWait # type: ignore
 import re
-import xlwt;
-from scrapy.http import TextResponse# type: ignore
-from scrapy.selector import Selector# type: ignore
-from selenium import webdriver # type: ignore
-from selenium.webdriver.common.by import By # type: ignore
-from selenium.webdriver.common.action_chains import ActionChains # type: ignore
-from selenium.webdriver.support.ui import WebDriverWait # type: ignore
-from selenium.webdriver.support import expected_conditions as EC # type: ignore
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait 
+from selenium.webdriver.support import expected_conditions as EC 
 
 
 class Website:
@@ -115,18 +109,26 @@ class Website:
 
 ##################################################### Spreadsheet Methods #####################################################
 
-    def write_to_sheet(self,row, cleaned_data):
-        return ""
-        # for col, field_name in enumerate(self.webconfig_data):
-            # worksheet.write(0, col, field_name)
-            # sheet_tab.write(0, col, field_name)
-        # for row, response in enumerate(fields, start=1):
-        #     for col, field in enumerate(fields):
-        #         xpath = special_xpath.get(field, standard_xpath(field))
-        #         selector = response.xpath(xpath)
-        #         if field in big_fields:
-        #             content = '\n'.join(selector.extract())
-        #         else:
-        #             content = selector.extract_first()
+    def write_to_sheet(self, row, duplicative_data):
+        # return ""
+        self.spreadsheet
+        correction = 0
+        # When this data comes in it has multiple delimiters for the same thing and needs some trimming
+        corrected_columns = Website.correct_columns(duplicative_data)
+        for col, field_name in enumerate(duplicative_data):
+            self.spreadsheet.cell(row, col, field_name)
+            # sheet_tab.write(row, col, field_name)
 
-        #         sheet_tab.write(row, col, content)
+    #takes a dict and if the key has an int in it combines all similar values in one.
+    def correct_columns(duplicative_dict):
+        corrected_dict = {}
+        for key_val in duplicative_dict:
+            key = re.sub(r"\d", "", f"{key_val}") #regex remove all integers from string
+            print(key)
+            val = duplicative_dict[key_val]
+            if(key in corrected_dict):
+                val += corrected_dict[key]
+            corrected_dict.update({key,val})
+        print(corrected_dict)
+        return corrected_dict
+

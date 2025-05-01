@@ -1,6 +1,6 @@
 
 import time, json, os 
-from xlwt import Workbook 
+from openpyxl import Workbook 
 from sunayu import Sunayu
 from scrapy.selector import Selector
 from selenium import webdriver 
@@ -8,27 +8,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-##################################################### Helper Functions #####################################################
-
-def write_to_sheet(response_data, sheet_tab, fields):
-    for col, field_name in enumerate(fields):
-        # worksheet.write(0, col, field_name)
-        sheet_tab.write(0, col, field_name)
-    for row, response in enumerate(fields, start=1):
-        for col, field in enumerate(fields):
-            xpath = special_xpath.get(field, standard_xpath(field))
-            selector = response.xpath(xpath)
-            if field in big_fields:
-                content = '\n'.join(selector.extract())
-            else:
-                content = selector.extract_first()
-
-            sheet_tab.write(row, col, content)
-
-
-
-##################################################### Page Specific functions #####################################################
 
 #Currently unable to test this due to not having a login to Taleo. 
 def lockheed(driver, spreadsheet, webconfig_data):
@@ -73,7 +52,7 @@ def main():
             if "sunayu" in filename:
                 # continue
                 # sunayu(driver, workbook.add_sheet('sunayu'), json.load(open(full_path)))
-                website = Sunayu(driver, workbook.add_sheet('sunayu'), json.load(open(config_path)))
+                website = Sunayu(driver, workbook.create_sheet('sunayu'), json.load(open(config_path)))
                 website.process()
             elif "parsons" in filename:
                 continue
@@ -86,8 +65,6 @@ def main():
         else:
             print(f"Error decoding file type for file {filename}, issue with json values. Something funny is happening?")
             continue
-
-
 
     driver.quit()
     workbook.save('artius.xls')

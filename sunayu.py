@@ -37,5 +37,4 @@ class Sunayu(website.Website):
         for raw_line in raw_lines:
             plaintext_job_data += Sunayu.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
-        print(job_data)
-        return plaintext_job_data
+        return job_data
