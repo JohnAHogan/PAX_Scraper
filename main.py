@@ -1,6 +1,7 @@
 
 import time, json, os 
 from openpyxl import Workbook 
+from parsons import Parsons
 from sunayu import Sunayu
 from scrapy.selector import Selector
 from selenium import webdriver 
@@ -42,6 +43,7 @@ def lockheed(driver, spreadsheet, webconfig_data):
 def main():
     driver = webdriver.Firefox()
     workbook = Workbook()
+    workbook_name = 'artius.xls'
     folder_prefix=  "website_configs/"
     
     for file in os.listdir(folder_prefix):
@@ -50,13 +52,13 @@ def main():
             config_path = os.path.join(folder_prefix, filename)
             print("Scraping using file: " + config_path)
             if "sunayu" in filename:
-                # continue
-                # sunayu(driver, workbook.add_sheet('sunayu'), json.load(open(full_path)))
-                website = Sunayu(driver, workbook.create_sheet('sunayu'), json.load(open(config_path)))
+                website = Sunayu(driver, workbook.create_sheet('sunayu',0), json.load(open(config_path)))
                 website.process()
+                workbook.save(workbook_name)
             elif "parsons" in filename:
-                continue
-                parsons(driver, workbook.add_sheet('parsons'), json.load(open(config_path)))
+                website = Parsons(driver, workbook.add_sheet('parsons'), json.load(open(config_path)))
+                website.process()
+                workbook.save(workbook_name)
             elif "lockheed" in filename:
                 continue 
                 lockheed(driver, workbook.add_sheet('lockheed'), json.load(open(config_path)))

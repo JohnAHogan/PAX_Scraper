@@ -1,4 +1,4 @@
-import website
+from website import Website
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
@@ -12,8 +12,8 @@ class Sunayu(website.Website):
     def process(self):
         job_postings = self.get_job_postings()
         for index, job_page in enumerate(job_postings):
-            job_data = self.process_job_page(job_page)
-            self.write_to_sheet(index+2, job_data)
+            job_data, plaintext_data = self.process_job_page(job_page)
+            self.write_to_sheet(index+2, job_data, plaintext_data)
         return 0
     
     #Iterates through all the website pages
@@ -35,6 +35,6 @@ class Sunayu(website.Website):
         plaintext_job_data = []
         raw_lines = self.driver.find_element(By.ID, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()
         for raw_line in raw_lines:
-            plaintext_job_data += Sunayu.clean_out_markup(raw_line)
+            plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
-        return Sunayu.correct_columns(job_data) # remove key duplicates
+        return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates

@@ -7,34 +7,39 @@
             "view": "//a[text()=\"My View\"]",
             "show_more": "//td[text()=\"My Requisitions\"]/following-sibling::td//a[text()=\"Show me more items\"]",
             "detail_loaded": "//td[contains(text(),\"Requisition Information:\")]",
-            "hrefs": "//a[contains(@href,\"RequisitionView.jsp\")]",
-            "Labor Category": "//td[contains(text(),\"Labor Cat\") or contains(text(),\"Lab Cat\")]/following::b[1]/text()[not(contains(.,\"N/A\"))]"
+            "careers": "//a[contains(@href,\"jobs\")]",
+            "textbox": ".text-rich-text"
         },
 
-    "fields": 
-        [
-            {"Opened Date":"Opened Date"},
-            {"Requisition ID":"Requisition ID"},
-            {"LCAT":"LCAT"},
-            {"Status":"Status"},
-            {"TTO Lead Name":"TTO Lead Name"},
-            {"TTO Lead Email":"TTO Lead Email"},
-            {"Clearance":"Clearance"},
-            {"Reason for Opening":"Reason for Opening"},
-            {"Location":"Location"},
-            {"Travel":"N/A"},
-            {"TTO Number":"TTO Number"},
-            {"Full/Part Time":"Full/Part Time"},
-            {"Legacy Department":"Legacy Department"},
-            {"Opening Type":"Opening Type"},
-            {"Need by Date":"Need by Date"},
-            {"Project Name":"Project Name"},
-            {"Labor Category":"Labor Category"}
-        ],
-
-    "big_fields":
-        [
-            {"Description":"Description"},
-            {"Requirements":"Requirements"}
-        ]
+        "fields": 
+        {
+            "Opened Date":"",
+            "Requisition ID":"",
+            "LCAT":"",
+            "Status":"",
+            "Contact Name":"",
+            "Contact Email":"",
+            "Clearance":"",
+            "Reason for Opening":"",
+            "Location":"",
+            "Travel":"",
+            "Task Order":"This position is part of our",
+            "Full/Part Time":"Employment Type:",
+            "Legacy Department":"",
+            "Opening Type":"Remote Type:",
+            "Need by Date":"",
+            "Project Name":"",
+            "Description":"<multiline>Responsibilities include, but are not limited to",
+            "Description1":"<multiline>Key Responsibilities",
+            "Description2":"<multiline>Primary Responsibilities",
+            "Description3":"<multiline>Job Description:",
+            "Description4":"<multiline>Primary Responsibilities",
+            "Description5":"<multiline>Primary Responsibilities",
+            "Requirements":"<multiline>Basic Qualifications",
+            "Requirements1":"<multiline>Desired Qualifications",
+            "Requirements2":"<multiline>Desired Skills",
+            "Requirements3":"<multiline>Desired Skills",
+            "Requirements4":"<multiline>Desired Skills",
+            "Requirements5":"<multiline>Desired Skills"
+        }
 }

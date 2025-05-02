@@ -111,12 +111,13 @@ class Website:
 
 ##################################################### Spreadsheet Methods #####################################################
 
-    def write_to_sheet(self, row, web_data):
+    def write_to_sheet(self, row, web_data, plaintext):
         self.spreadsheet
         # When this data comes in it has multiple delimiters for the same thing and needs some trimming
         for col, field_name in enumerate(web_data):
-            self.spreadsheet.cell((row+1), (col+1), field_name)
+            self.spreadsheet.cell((row), (col+1), web_data[field_name])
             # sheet_tab.write(row, col, field_name)
+        self.spreadsheet.cell((row), (len(web_data)+1), str(plaintext))
 
     #takes a dict and if the key has an int in it combines all similar values in one.
     def correct_columns(duplicative_dict):
