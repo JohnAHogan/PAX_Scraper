@@ -2,6 +2,7 @@ import re
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
+from selenium.webdriver.common.by import By
 
 
 class Website:
@@ -11,6 +12,8 @@ class Website:
         self.spreadsheet = spreadsheet
         self.webconfig_data = webconfig_data
         self.page_elements = webconfig_data['page_elements']
+        for col, field_name in enumerate(Website.correct_columns(webconfig_data['fields'])):
+            self.spreadsheet.cell(1, (col+1), field_name)
 
 ##################################################### Selenium Helper Methods #####################################################
 
@@ -76,7 +79,6 @@ class Website:
             delimiter2 = delimiter.replace("<multiline>", "")
             start_delimiter_row = Website.get_row_of_delimiter(raw_data,  delimiter2)
             if start_delimiter_row == -1:
-                print(f"cannot figure out delim {delimiter2}")
                 return ""
             else:
                 next_delimiter_row = self.get_next_delimiter_row(start_delimiter_row, raw_data)
@@ -109,14 +111,11 @@ class Website:
 
 ##################################################### Spreadsheet Methods #####################################################
 
-    def write_to_sheet(self, row, duplicative_data):
-        # return ""
+    def write_to_sheet(self, row, web_data):
         self.spreadsheet
-        correction = 0
         # When this data comes in it has multiple delimiters for the same thing and needs some trimming
-        corrected_columns = Website.correct_columns(duplicative_data)
-        for col, field_name in enumerate(duplicative_data):
-            self.spreadsheet.cell(row, col, field_name)
+        for col, field_name in enumerate(web_data):
+            self.spreadsheet.cell((row+1), (col+1), field_name)
             # sheet_tab.write(row, col, field_name)
 
     #takes a dict and if the key has an int in it combines all similar values in one.
@@ -124,11 +123,9 @@ class Website:
         corrected_dict = {}
         for key_val in duplicative_dict:
             key = re.sub(r"\d", "", f"{key_val}") #regex remove all integers from string
-            print(key)
             val = duplicative_dict[key_val]
             if(key in corrected_dict):
                 val += corrected_dict[key]
-            corrected_dict.update({key,val})
-        print(corrected_dict)
+            corrected_dict.update({key:val})
         return corrected_dict
 

@@ -13,7 +13,7 @@ class Sunayu(website.Website):
         job_postings = self.get_job_postings()
         for index, job_page in enumerate(job_postings):
             job_data = self.process_job_page(job_page)
-            self.write_to_sheet(index, job_data)
+            self.write_to_sheet(index+2, job_data)
         return 0
     
     #Iterates through all the website pages
@@ -37,4 +37,4 @@ class Sunayu(website.Website):
         for raw_line in raw_lines:
             plaintext_job_data += Sunayu.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
-        return job_data
+        return Sunayu.correct_columns(job_data) # remove key duplicates
