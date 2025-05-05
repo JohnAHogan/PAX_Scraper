@@ -5,49 +5,58 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 
-class Parsons(website.Website):
+class Parsons(Website):
 
     # Lots of room for improvement here. Ideas from worst to best:
     # 1: Can enhance speed some
     # 2: Pulls all jobs globally. Not ideal. filter DMV only somehow.
     # 3: Job data comes out super weird. 
-    def parsons(driver, spreadsheet, webconfig_data):
-        driver.get(webconfig_data['URL'])
-        time.sleep(3) # can't figure out how to load page properly, caveman wait only
-        website.infiniscroll_to_bottom(driver)
-        xpath = webconfig_data['page_elements']
-        links = driver.find_elements(By.XPATH, xpath['careers'])
-        job_postings = [el.get_attribute('href') for el in links]
-
-        #process through the website pages, format data, write to sheet
+    
     def process(self):
         job_postings = self.get_job_postings()
         for index, job_page in enumerate(job_postings):
-            job_data, plaintext_data = self.process_job_page(job_page)
-            
-            self.write_to_sheet(index+2, job_data, plaintext_data)
+            try:
+                job_data, plaintext_data = self.process_job_page(job_page)
+                self.write_to_sheet(index+2, job_data, plaintext_data)
+            except:
+                print(f"Fail on webpage, might be worth looking into.  {job_page}")
+                continue
         return 0
     
     #Iterates through all the website pages
     def get_job_postings(self):
         self.driver.get(self.webconfig_data['URL'])
-        self.wait(self.page_elements['careers']) #ensures page text loads.
-
+        self.wait(self.page_elements['header'], By.CSS_SELECTOR) #ensure page text loads
+        Website.infiniscroll_to_bottom(self.driver)
         links = self.driver.find_elements(By.XPATH, self.page_elements['careers'])
         job_postings = [el.get_attribute('href') for el in links]
-
-        return job_postings
+        return set(job_postings)
     
 
     def process_job_page(self, job_page):
         self.driver.get(job_page)
-        self.wait(self.page_elements['textbox'], By.ID) #ensure page text loads
+        # time.sleep(1)
+        self.wait(self.page_elements['header'], By.CSS_SELECTOR) #ensure page text loads
         plaintext_job_data = []
-        raw_lines = self.driver.find_element(By.ID, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()
+        raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()
+        # print(raw_lines)
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
-        job_data = Parsons.process_outside_text(job_data)
+        job_data = self.process_outside_text(job_data)
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
     
-    def process_outside_text(job_data):
+    def process_outside_text(self, job_data):
+        job_row = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_row']).get_attribute("innerHTML")
+        job_row = Website.clean_out_markup(job_row)
+        try:
+            job_data.update({'Location':job_row[0]})
+            job_data.update({'Requisition ID':job_row[1]})
+            job_data.update({'Clearance':job_row[3]})
+        except:
+            #we dont really do anything here. The data is inconsistent on 0.1% of pages for some reason. Legacy?
+            print("Error parsing jobs row on Parsons site. ")
+        job_title = Website.clean_out_markup(self.driver.find_element(By.CSS_SELECTOR, self.page_elements['header']).get_attribute("innerHTML"))
+        # print(job_title)
+        job_data.update({'LCAT':job_title[0]})
+        return job_data

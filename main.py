@@ -3,6 +3,7 @@ import time, json, os
 from openpyxl import Workbook 
 from parsons import Parsons
 from sunayu import Sunayu
+from gdit import GDIT
 from scrapy.selector import Selector
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
@@ -52,16 +53,21 @@ def main():
             config_path = os.path.join(folder_prefix, filename)
             print("Scraping using file: " + config_path)
             if "sunayu" in filename:
+                continue
                 website = Sunayu(driver, workbook.create_sheet('sunayu',0), json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             elif "parsons" in filename:
-                website = Parsons(driver, workbook.add_sheet('parsons'), json.load(open(config_path)))
+                continue
+                website = Parsons(driver, workbook.create_sheet('parsons',0), json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             elif "lockheed" in filename:
                 continue 
-                lockheed(driver, workbook.add_sheet('lockheed'), json.load(open(config_path)))
+                lockheed(driver, workbook.create_sheet('lockheed'), json.load(open(config_path)))
+            elif "gdit" in filename:
+                website = GDIT(driver, workbook.create_sheet('gdit'), json.load(open(config_path)))
+                website.process()
             else:
                 print(f"Unable to find scraping algorithm for {filename}")
         else:

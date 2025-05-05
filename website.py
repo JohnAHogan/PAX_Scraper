@@ -1,4 +1,5 @@
 import re
+import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
@@ -47,7 +48,12 @@ class Website:
             time.sleep(0.5)
             new_height = driver.execute_script("return document.body.scrollHeight")
             if new_height == old_height:
-                break
+                #if we can't scroll down, we might be at bottom. Try again and return if so. 
+                time.sleep(0.2)
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                new_height = driver.execute_script("return document.body.scrollHeight")
+                if new_height == old_height:
+                    break
 
 ##################################################### Data Methods #####################################################
 

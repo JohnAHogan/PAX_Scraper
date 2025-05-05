@@ -1,14 +1,14 @@
 {
-    "URL":"https://jobs.parsons.com/career-search?cf-rec-lrv-security=secret%7Ctopsecret%7Ctopsecretsci%7Ctopsecretsciw-polygraph%7Cdepartment-of-energy-doe-q%7Cdepartment-of-energy-doe-l%7Cconfidential",
+    "URL":"https://www.gdit.com/careers/search/?page=1&filterClearance=Top%20Secret%20SCI%20%2B%20Polygraph&filterClearance=Top%20Secret%2FSCI&filterClearance=Top%20Secret&filterLocation=Maryland&filterLocation=Virginia&filterLocation=District%20of%20Columbia",
 
     "page_elements":
         {
             "dropdown": "//a[@class=\"nav-link dropdown-toggle\" and contains(text(),\"My \")]",
-            "view": "//a[text()=\"My View\"]",
-            "job_description_row": "div.margin-bottom:nth-child(3) > div:nth-child(1)",
-            "header": ".heading-style-h1",
-            "careers": "//a[contains(@href,\"jobs/\")]",
-            "textbox": ".text-rich-text"
+            "next_page_button": "//*[@class=\"page-item\"]",
+            "job_description_row_css": "#carers-job-summary-w-cta",
+            "header_css": ".h2",
+            "careers": "//a[contains(@href,\"careers/job/\")]",
+            "textbox_css": ".long-form"
         },
 
         "fields": 
