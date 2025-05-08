@@ -13,32 +13,30 @@
 
         "fields": 
         {
-            "Opened Date":"",
-            "Requisition ID":"",
+            "Payband":"",
+            "Requisition ID":"REQ#:",
             "LCAT":"",
-            "Status":"",
-            "Contact Name":"",
-            "Contact Email":"",
             "Clearance":"",
-            "Reason for Opening":"",
             "Location":"",
             "Travel":"",
             "Task Order":"This position is part of our",
             "Full/Part Time":"Employment Type:",
-            "Legacy Department":"",
-            "Opening Type":"Remote Type:",
-            "Need by Date":"",
+            "Opening Type":"Requisition Type:",
             "Project Name":"",
-            "Description":"<multiline>Responsibilities include, but are not limited to",
+            "Description":"<multiline>Responsibilities:",
             "Description1":"<multiline>Key Responsibilities",
             "Description2":"<multiline>Primary Responsibilities",
             "Description3":"<multiline>What You'll Be Doing:",
-            "Description5":"<multiline>Job Description:",
+            "Description6":"<multiline>WHAT YOU WILL DO:",
+            "Description5":"<multiline>Job Description",
             "Requirements":"<multiline>Basic Qualifications",
             "Requirements1":"<multiline>Desired Qualifications",
             "Requirements2":"<multiline>Qualifications:",
             "Requirements3":"<multiline>Desired Skills",
             "Requirements4":"<multiline>Required Skills",
-            "Requirements5":"<multiline>What You Need To Have"
+            "Requirements5":"<multiline>What You Need To Have", 
+            "Requirements6":"<multiline>Certifications:",
+            "Requirements7":"<multiline>NEED TO SUCCEED:",
+            "Requirements8":"<multiline>EXPERIENCE:"
         }
 }

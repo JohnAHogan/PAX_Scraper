@@ -1,3 +1,4 @@
+import re
 from website import Website
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -6,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 
-class Sunayu(Website):
+class Grayband(Website):
 
     #process through the website pages, format data, write to sheet
     def process(self):
@@ -15,8 +16,9 @@ class Sunayu(Website):
             try:
                 job_data, plaintext_data = self.process_job_page(job_page)
                 self.write_to_sheet(index+2, job_data, plaintext_data)
-            except:
+            except Exception as e:
                 print(f"Fail on webpage, might be worth looking into.    {job_page}")
+                print(e)
                 continue
         return 0
     
@@ -35,15 +37,29 @@ class Sunayu(Website):
 
     def process_job_page(self, job_page):
         self.driver.get(job_page)
-        self.wait(self.page_elements['textbox'], By.ID) #ensure page text loads
+        self.wait(self.page_elements['textbox_css'], By.CSS_SELECTOR) #ensure page text loads
         plaintext_job_data = []
-        raw_lines = self.driver.find_element(By.ID, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()
+        raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox_css']).get_attribute("innerHTML").splitlines()
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
+        job_data.update({"LCAT":plaintext_job_data[0]}) #Specialized thing we've got to do for Grayband to get position title
         job_data = self.process_special(job_data, plaintext_job_data)
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
     
     def process_outside_text(self, job_data):
-        #We dont need to do any of this because all relevant data is in the text box
         return job_data
+    
+    #Process some fun things like regex and all that
+    def process_special(self, job_data, plaintext_array):
+        job_data.update(Grayband.find_pay_band(plaintext_array))
+        return job_data
+
+    # Defeating engineers with jank HTML data
+    def find_pay_band(raw_data_array) -> {str,str}:
+        for row in raw_data_array:
+            if ('$' in row):
+                lower = row.lower()
+                if (not "bonus" in lower) and (not 'sign-on' in lower):
+                    return {"Payband":str([str(amount) for amount in re.findall(r'\$\d+(?:\.\d+)?k\s*-\s*\$\d+(?:\.\d+)?k\b', row)])}
+        return {"Payband":""}

@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class Website:
@@ -55,6 +56,10 @@ class Website:
                 if new_height == old_height:
                     break
 
+    # UNTESTED UNTESTED UNTESTED UNTESTED
+    def scroll_to_element(self, element, mode=By.XPATH):
+        ActionChains(self.driver).move_to_element(self.driver.sl.find_elements(mode, element)).perform()
+
 ##################################################### Data Methods #####################################################
 
     def get_row_of_delimiter(raw_data, delimiter):
@@ -102,18 +107,43 @@ class Website:
         for field, delimiter in self.webconfig_data["fields"].items():
             sheet_row.update({field: self.find_data(raw_data, delimiter)})
         return sheet_row
+    
+    #Process some fun things like regex and all that
+    def process_special(self, job_data, plaintext_array):
+        job_data.update(Website.find_pay_band(plaintext_array))
+        return job_data
 
     # Cleans out HTML markup data. When seperating out the split data, returns in form of array of strings.
-    # Also removes 'invisible' chars because python does not understand them.
+    # Also removes 'invisible' chars and others that can be problematic due to UTF limitations. WHEN WILL WE LEARN?
     def clean_out_markup(marked_text):
         list = Website.remove_between(marked_text, '<','>').split('<>') #clears out tags
         while '' in list:
             list.remove('') #remove empty lines
         for index, item in enumerate(list):
             item = item.replace("&nbsp;","") # nonbreaking space
-            item = item.replace('u200b',"") 
+            item = item.replace('u200b',"")
+            item = item.replace('●',"") # causes weird issues when viewed in Excel
             list[index] = item 
         return list
+    
+    # Unfortunately we have to iterate through all the text data and we can't check as we go through. 
+    # Job listings have a nasty habit of adding all sorts of ancillary data and dollar amounts and it's just a whole thing. 
+    # This function looks weird....and it is.....but it's to defeat HR so hopefully that is forgivable.
+    # Here is the regex:
+    #     \$: Matches a literal dollar sign.
+    #     \s*: Matches zero or more whitespace characters.
+    # (\d+(?:,\d{3})*(?:\.\d+)?): This part captures the dollar amount:
+    #     \d+: Matches one or more digits.
+    #     (?:,\d{3})*: Matches zero or more occurrences of a comma followed by three digits (for thousands separators).
+    #     (?:\.\d+)?: Matches an optional decimal point followed by one or more digits.
+    # And we want multiple dollar amounts to capture ranges if they happen
+    def find_pay_band(raw_data_array) -> {str,str}:
+        for row in raw_data_array:
+            if ('$' in row) and (',' in row):
+                lower = row.lower()
+                if (not "bonus" in lower) and (not 'sign-on' in lower):
+                    return {"Payband":str(['$'+str(amount) for amount in re.findall(r'\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)', row)])}
+        return {"Payband":""}
 
 ##################################################### Spreadsheet Methods #####################################################
 

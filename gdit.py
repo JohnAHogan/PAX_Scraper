@@ -14,23 +14,27 @@ class GDIT(Website):
     
     def process(self):
         job_postings = self.get_job_postings()
+        self.driver.set_page_load_timeout(5)
         for index, job_page in enumerate(job_postings):
             try:
                 job_data, plaintext_data = self.process_job_page(job_page)
+                job_data.update()
                 self.write_to_sheet(index+2, job_data, plaintext_data)
-                break
-            except:
+            except Exception as e:
                 print(f"Fail on webpage, might be worth looking into.  {job_page}")
+                print(e)
                 continue
+            if(index > 10):
+                break
         return 0
     
     #Iterates through all the website pages
     def get_job_postings(self):
         self.driver.get(self.webconfig_data['URL'])
-        # job_set = {}
         job_set = set()
         job_postings = []
         old_value = 0
+
         while True:
             self.wait(self.page_elements['careers']) #ensure page text loads
             Website.infiniscroll_to_bottom(self.driver)
@@ -39,8 +43,7 @@ class GDIT(Website):
             job_postings = [el.get_attribute('href') for el in links]
             for job in job_postings:
                 job_set.add(job)
-            break
-            #The best way I've found to stop iterating through this is to just wait until we have all the jobs
+            #This is a bit of a caveman solution, we iterate until we don't find any new jobs to add.
             if(old_value != len(job_set)):
                 old_value = len(job_set)
             else:
@@ -50,26 +53,39 @@ class GDIT(Website):
     
 
     def process_job_page(self, job_page):
-        self.driver.get(job_page)
-        # self.wait(self.page_elements['header'], By.CSS_SELECTOR) #ensure page text loads
+        try:
+            self.driver.get(job_page)
+        except Exception as TE:
+            self.wiggle() #this speeds things up sometimes. Jank AF.
         plaintext_job_data = []
         raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox_css']).get_attribute("innerHTML").splitlines()
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
-        print(plaintext_job_data)
         job_data = self.process_data(plaintext_job_data)
+        job_data = self.process_special(job_data, plaintext_job_data)
         job_data = self.process_outside_text(job_data)
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
-    
+
     def process_outside_text(self, job_data):
         job_row = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_row_css']).get_attribute("innerHTML")
         job_row = Website.clean_out_markup(job_row)
         try:
             job_data.update({'Clearance':job_row[1]})
             job_data.update({'Location':job_row[5]})
+            job_data.update({'Category':job_row[4]})
         except:
-            True #this shouldnt fail
+            True #this shouldnt fail but I hate dumb NPEs
         job_title = Website.clean_out_markup(self.driver.find_element(By.CSS_SELECTOR, self.page_elements['header_css']).get_attribute("innerHTML"))
-        print(job_title)
-        job_data.update({'LCAT':str(job_title)})
+        try:
+            job_data.update({'LCAT':job_title[0]})
+        except:
+            job_data.update({'LCAT':str(job_title)}) #caveman solution
         return job_data
+    
+    # Look. I've tried. I've tried to make this work without this dumb function. 
+    # But sometimes we just get stuck and this is the ONLY thing I can think of that speeds things up.
+    # I think because certain elements on the GDIT page load when you scroll it gets confused
+    def wiggle(self):
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(0.3)
+        self.driver.execute_script("window.scrollTo(0, 0);")

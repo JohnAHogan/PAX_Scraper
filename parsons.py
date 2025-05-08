@@ -27,6 +27,7 @@ class Parsons(Website):
     def get_job_postings(self):
         self.driver.get(self.webconfig_data['URL'])
         self.wait(self.page_elements['header'], By.CSS_SELECTOR) #ensure page text loads
+        time.sleep(3) #above wait sometimes fails
         Website.infiniscroll_to_bottom(self.driver)
         links = self.driver.find_elements(By.XPATH, self.page_elements['careers'])
         job_postings = [el.get_attribute('href') for el in links]
@@ -43,9 +44,10 @@ class Parsons(Website):
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
+        job_data = self.process_special(job_data, plaintext_job_data)
         job_data = self.process_outside_text(job_data)
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
-    
+
     def process_outside_text(self, job_data):
         job_row = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_row']).get_attribute("innerHTML")
         job_row = Website.clean_out_markup(job_row)

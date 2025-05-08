@@ -1,0 +1,26 @@
+{
+    "URL":"https://grayband.io/",
+
+    "page_elements":
+        {
+            "careers": "//a[contains(@href,\"careers/\")]",
+            "textbox_css": ".max-w-2xl"
+        },
+
+    "fields": 
+        {
+            "Payband":"",
+            "Requisition ID":"<multiline>Job ID",
+            "LCAT":"<multiline>Category",
+            "Clearance":"<multiline>Clearance",
+            "Location":"<multiline>Location",
+            "Travel":"<multiline>Travel Required",
+            "Full/Part Time":"<multiline>Employment Type",
+            "Opening Type":"<multiline>Remote Type",
+            "Telework":"<multiline>Role Type",
+            "Description":"<multiline>Position Summary",
+            "Requirements":"<multiline>Qualifications",
+            "Requirements1":"<multiline>Preferred Certifications",
+            "Requirements2":"<multiline>Specialized Qualifications"
+        }
+}
