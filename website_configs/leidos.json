@@ -1,34 +1,34 @@
+
 {
-    "URL":"https://www.gdit.com/careers/search/?page=1&filterClearance=Top%20Secret%20SCI%20%2B%20Polygraph&filterClearance=Top%20Secret%2FSCI&filterClearance=Top%20Secret&filterLocation=Maryland&filterLocation=Virginia&filterLocation=District%20of%20Columbia",
+    "URL":"https://careers.leidos.com/search/clearance/top-secret-sci-with-polygraph-top-secret-sci-top-secret/jobs/in/dc-district-of-columbia-md-maryland-va-virginia",
 
     "page_elements":
         {
-            "dropdown": "//a[@class=\"nav-link dropdown-toggle\" and contains(text(),\"My \")]",
-            "next_page_button": "//*[@class=\"page-item\"]",
-            "job_description_row_css": "#carers-job-summary-w-cta",
-            "header_css": ".h2",
-            "careers": "//a[contains(@href,\"careers/job/\")]",
-            "textbox_css": ".long-form"
+            "next_page_button": "//*[@class=\"next_page\"]",
+            "job_description_data_css": ".job-data",
+            "header_css": ".heading-2",
+            "careers": "//a[contains(@href,\"com/jobs/\")]",
+            "textbox_css": ".job-description-outer"
         },
 
         "fields": 
         {
             "URL":"",
             "Payband":"",
-            "Requisition ID":"REQ#:",
+            "Job #":"<multiline>REQ#",
             "LCAT":"",
-            "Clearance":"",
-            "Location":"",
+            "Clearance":"<multiline>Clearance",
+            "Location":"<multiline>Location:",
             "Travel":"",
-            "Task Order":"This position is part of our",
-            "Full/Part Time":"Employment Type:",
-            "Opening Type":"Requisition Type:",
-            "Project Name":"",
+            "Sector":"<multiline>",
+            "Schedule":"<multiline>Schedule (FT/PT)",
+            "External Referral Eligable:":"Requisition Type",
+            "Referral Bonus":"",
             "Description":"<multiline>Responsibilities:",
             "Description1":"<multiline>Key Responsibilities",
             "Description2":"<multiline>Primary Responsibilities",
             "Description3":"<multiline>What You'll Be Doing:",
-            "Description6":"<multiline>WHAT YOU WILL DO:",
+            "Description6":"<multiline>Description:",
             "Description5":"<multiline>Job Description",
             "Requirements":"<multiline>Basic Qualifications",
             "Requirements1":"<multiline>Desired Qualifications",

@@ -13,6 +13,7 @@
 
         "fields": 
         {
+            "URL":"",
             "Opened Date":"",
             "Requisition ID":"",
             "LCAT":"",

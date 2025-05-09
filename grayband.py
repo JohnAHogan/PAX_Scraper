@@ -17,7 +17,7 @@ class Grayband(Website):
                 job_data, plaintext_data = self.process_job_page(job_page)
                 self.write_to_sheet(index+2, job_data, plaintext_data)
             except Exception as e:
-                print(f"Fail on webpage, might be worth looking into.    {job_page}")
+                print(f"Fail on webpage, might be worth looking into.  {job_page}")
                 print(e)
                 continue
         return 0
@@ -45,6 +45,7 @@ class Grayband(Website):
         job_data = self.process_data(plaintext_job_data)
         job_data.update({"LCAT":plaintext_job_data[0]}) #Specialized thing we've got to do for Grayband to get position title
         job_data = self.process_special(job_data, plaintext_job_data)
+        job_data.update({"URL":job_page})
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
     
     def process_outside_text(self, job_data):

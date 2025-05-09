@@ -36,7 +36,7 @@ class Parsons(Website):
 
     def process_job_page(self, job_page):
         self.driver.get(job_page)
-        # time.sleep(1)
+        print(f"   {job_page}")
         self.wait(self.page_elements['header'], By.CSS_SELECTOR) #ensure page text loads
         plaintext_job_data = []
         raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()
@@ -46,6 +46,7 @@ class Parsons(Website):
         job_data = self.process_data(plaintext_job_data)
         job_data = self.process_special(job_data, plaintext_job_data)
         job_data = self.process_outside_text(job_data)
+        job_data.update({"URL":job_page})
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
 
     def process_outside_text(self, job_data):

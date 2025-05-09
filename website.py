@@ -56,10 +56,6 @@ class Website:
                 if new_height == old_height:
                     break
 
-    # UNTESTED UNTESTED UNTESTED UNTESTED
-    def scroll_to_element(self, element, mode=By.XPATH):
-        ActionChains(self.driver).move_to_element(self.driver.sl.find_elements(mode, element)).perform()
-
 ##################################################### Data Methods #####################################################
 
     def get_row_of_delimiter(raw_data, delimiter):

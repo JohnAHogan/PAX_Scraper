@@ -42,6 +42,7 @@ class Sunayu(Website):
             plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
         job_data = self.process_special(job_data, plaintext_job_data)
+        job_data.update({"URL":job_page})
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
     
     def process_outside_text(self, job_data):

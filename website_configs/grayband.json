@@ -9,6 +9,7 @@
 
     "fields": 
         {
+            "URL":"",
             "Payband":"",
             "Requisition ID":"<multiline>Job ID",
             "LCAT":"<multiline>Category",

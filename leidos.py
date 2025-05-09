@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 
-class GDIT(Website):
+class Leidos(Website):
 
     # Lots of room for improvement here. Ideas from worst to best:
     # 1: Can enhance speed some
@@ -21,9 +21,10 @@ class GDIT(Website):
                 job_data.update()
                 self.write_to_sheet(index+2, job_data, plaintext_data)
             except Exception as e:
-                print(f"Fail on webpage, might be worth looking into.  {job_page}")
+                print(f"Fail on webpage. This is a Leidos processing error, high chance that CloudFlare is involved. {job_page}")
                 print(e)
                 continue
+        self.driver.set_page_load_timeout(15)
         return 0
     
     #Iterates through all the website pages
@@ -35,18 +36,28 @@ class GDIT(Website):
 
         while True:
             self.wait(self.page_elements['careers']) #ensure page text loads
-            Website.infiniscroll_to_bottom(self.driver)
-            next_page_button = self.driver.find_elements(By.XPATH, self.page_elements['next_page_button'])[-1]
+            next_page_button = self.driver.find_elements(By.XPATH, self.page_elements['next_page_button'])
+            ActionChains(self.driver).scroll_by_amount(0, 750).perform()
+            ActionChains(self.driver).scroll_by_amount(0, 750).perform()
+            ActionChains(self.driver).scroll_by_amount(0, 750).perform()
+            next_page_button[-1].click()
+            quit()
+            # self.driver.execute_script("arguments[0].scrollIntoView()", next_page_button)
+            # self.scroll_to_element(self.page_elements['next_page_button'])
+            # quit()
+            print(F"{next_page_button}")
             links = self.driver.find_elements(By.XPATH, self.page_elements['careers'])
-            job_postings = [el.get_attribute('href') for el in links]
+            job_postings = set([el.get_attribute('href') for el in links])
             for job in job_postings:
                 job_set.add(job)
+            print(job_set)
             #This is a bit of a caveman solution, we iterate until we don't find any new jobs to add.
             if(old_value != len(job_set)):
                 old_value = len(job_set)
             else:
                 break
-            next_page_button.click()
+            next_page_button[-1].click()
+            quit()
         return job_set
     
 
@@ -66,14 +77,9 @@ class GDIT(Website):
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
 
     def process_outside_text(self, job_data):
-        job_row = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_row_css']).get_attribute("innerHTML")
+        job_row = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_data_css']).get_attribute("innerHTML")
         job_row = Website.clean_out_markup(job_row)
-        try:
-            job_data.update({'Clearance':job_row[1]})
-            job_data.update({'Location':job_row[5]})
-            job_data.update({'Category':job_row[4]})
-        except:
-            True #this shouldnt fail but I hate dumb NPEs
+        job_data.update(self.process_data(job_row))
         job_title = Website.clean_out_markup(self.driver.find_element(By.CSS_SELECTOR, self.page_elements['header_css']).get_attribute("innerHTML"))
         try:
             job_data.update({'LCAT':job_title[0]})
