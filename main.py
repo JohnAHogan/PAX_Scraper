@@ -34,32 +34,32 @@ def main():
             print("Scraping using file: " + config_path)
             #todo: Turn this shit into a factory class
             if "sunayu" in filename:
-                continue
+                # continue
                 website = Sunayu(driver, workbook, 'Sunayu', json.load(open(config_path)))
-                website.process()
+                website.run()
                 workbook.save(workbook_name)
             elif "parsons" in filename:
-                continue
+                # continue
                 website = Parsons(driver, workbook, "Parsons", json.load(open(config_path)))
-                website.process()
+                website.run()
                 workbook.save(workbook_name)
             elif "grayband" in filename:
-                continue 
+                # continue 
                 website = Grayband(driver, workbook, 'Grayband', json.load(open(config_path)))
-                website.process()
+                website.run()
                 workbook.save(workbook_name)
             elif "gdit" in filename:
-                continue
+                # continue
                 website = GDIT(driver, workbook, 'GDIT', json.load(open(config_path)))
-                website.process()
+                website.run()
                 workbook.save(workbook_name)
             elif "leidos" in filename:
                 # continue
                 website = Leidos(driver, workbook, 'Leidos', json.load(open(config_path)))
-                website.process()
+                website.run()
                 workbook.save(workbook_name)
             elif "akina" in filename:
-                continue
+                # continue
                 website = Akina(driver, workbook, 'Akina', json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)

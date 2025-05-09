@@ -59,8 +59,8 @@ class Website:
 
 ##################################################### Data Methods #####################################################
 
-        #process through the website pages, format data, write to sheet
-    def process(self):
+    #process through the website pages, format data, write to sheet
+    def run(self):
         job_postings = self.get_job_postings()
         num_jobs = len(job_postings)
         self.driver.set_page_load_timeout(5)

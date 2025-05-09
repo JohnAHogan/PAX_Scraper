@@ -6,26 +6,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 
 class Leidos(Website):
-
-    # Lots of room for improvement here. Ideas from worst to best:
-    # 1: Can enhance speed some
-    # 2: Pulls all jobs globally. Not ideal. filter DMV only somehow.
-    # 3: Job data comes out super weird. 
-    
-    # def process(self):
-    #     job_postings = self.get_job_postings()
-    #     self.driver.set_page_load_timeout(5)
-    #     for index, job_page in enumerate(job_postings):
-    #         try:
-    #             job_data, plaintext_data = self.process_job_page(job_page)
-    #             self.write_to_sheet(index+2, job_data, plaintext_data)
-    #         except Exception as e:
-    #             print(f"Fail on webpage. This is a Leidos processing error, high chance that CloudFlare is involved. {job_page}")
-    #             print(e)
-    #             continue
-    #         # break
-    #     self.driver.set_page_load_timeout(15)
-    #     return 0
     
     #Iterates through all the website pages
     def get_job_postings(self):
