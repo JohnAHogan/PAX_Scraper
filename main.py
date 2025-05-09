@@ -6,17 +6,12 @@ from grayband import Grayband
 from leidos import Leidos
 from parsons import Parsons
 from sunayu import Sunayu
+from progress_bar import workbook_name
 from gdit import GDIT
-from scrapy.selector import Selector
 from selenium import webdriver 
-from selenium.webdriver.common.by import By 
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 ##################################################### Main Method #####################################################
-
 def main():
     options = webdriver.FirefoxOptions()
     # options.add_argument("-headless")
@@ -27,9 +22,9 @@ def main():
     options.profile = firefox_profile
     driver = webdriver.Firefox(options)
     driver.set_page_load_timeout(15)
-    
+
     workbook = Workbook()
-    workbook_name = f'PAX-{date.today()}.xls'
+    # workbook_name = f'PAX-{date.today()}.xls'
     folder_prefix=  "website_configs/"
     
     for file in os.listdir(folder_prefix):
@@ -40,32 +35,32 @@ def main():
             #todo: Turn this shit into a factory class
             if "sunayu" in filename:
                 continue
-                website = Sunayu(driver, workbook.create_sheet('sunayu',0), json.load(open(config_path)))
+                website = Sunayu(driver, workbook, 'Sunayu', json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             elif "parsons" in filename:
                 continue
-                website = Parsons(driver, workbook.create_sheet('parsons',0), json.load(open(config_path)))
+                website = Parsons(driver, workbook, "Parsons", json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             elif "grayband" in filename:
                 continue 
-                website = Grayband(driver, workbook.create_sheet('grayband',0), json.load(open(config_path)))
+                website = Grayband(driver, workbook, 'Grayband', json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             elif "gdit" in filename:
                 continue
-                website = GDIT(driver, workbook.create_sheet('gdit',0), json.load(open(config_path)))
+                website = GDIT(driver, workbook, 'GDIT', json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             elif "leidos" in filename:
                 # continue
-                website = Leidos(driver, workbook.create_sheet('leidos',0), json.load(open(config_path)))
+                website = Leidos(driver, workbook, 'Leidos', json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             elif "akina" in filename:
                 continue
-                website = Akina(driver, workbook.create_sheet('Akina',0), json.load(open(config_path)))
+                website = Akina(driver, workbook, 'Akina', json.load(open(config_path)))
                 website.process()
                 workbook.save(workbook_name)
             else:

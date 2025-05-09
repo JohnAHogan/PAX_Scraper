@@ -1,4 +1,5 @@
 import re
+from progress_bar import ProgressBar
 from website import Website
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -9,18 +10,6 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class Grayband(Website):
 
-    #process through the website pages, format data, write to sheet
-    def process(self):
-        job_postings = self.get_job_postings()
-        for index, job_page in enumerate(job_postings):
-            try:
-                job_data, plaintext_data = self.process_job_page(job_page)
-                self.write_to_sheet(index+2, job_data, plaintext_data)
-            except Exception as e:
-                print(f"Fail on webpage, might be worth looking into.  {job_page}")
-                print(e)
-                continue
-        return 0
     
     #Iterates through all the website pages
     def get_job_postings(self):

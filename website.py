@@ -1,19 +1,24 @@
 import re
 import time
+from progress_bar import workbook_name
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
+from progress_bar import ProgressBar
+
 
 class Website:
 
-    def __init__(self, driver, spreadsheet, webconfig_data):
+    def __init__(self, driver, workbook, sheet_name, webconfig_data):
         self.driver = driver
-        self.spreadsheet = spreadsheet
+        self.spreadsheet = workbook.create_sheet(sheet_name,0)
+        self.workbook = workbook
         self.webconfig_data = webconfig_data
         self.page_elements = webconfig_data['page_elements']
+        self.progress_bar = ProgressBar()
         for col, field_name in enumerate(Website.correct_columns(webconfig_data['fields'])):
             self.spreadsheet.cell(1, (col+1), field_name)
 
@@ -24,10 +29,6 @@ class Website:
             EC.visibility_of_element_located((mode, identifier))
         )
         return element
-
-    def wait_and_click(self, identifier,mode=By.XPATH, duration=10):
-        element = self.wait(identifier, mode, duration)
-        element.click()
 
     def load_fields(json_fields):
         fields = []
@@ -57,6 +58,28 @@ class Website:
                     break
 
 ##################################################### Data Methods #####################################################
+
+        #process through the website pages, format data, write to sheet
+    def process(self):
+        job_postings = self.get_job_postings()
+        num_jobs = len(job_postings)
+        self.driver.set_page_load_timeout(5)
+        for index, job_page in enumerate(job_postings):
+            try:
+                job_data, plaintext_data = self.process_job_page(job_page)
+                self.write_to_sheet(index+2, job_data, plaintext_data)
+                self.progress_bar.refresh(index, num_jobs)
+            except Exception as e:
+                print(f"Fail on webpage, might be worth looking into.  {job_page}")
+                print(e)
+                continue
+            if(index%25 == 0):
+                self.workbook.save(workbook_name)
+                time.sleep(1)
+        self.driver.set_page_load_timeout(15)
+        return 0
+
+
 
     def get_row_of_delimiter(raw_data, delimiter):
         for index, row in enumerate(raw_data):
@@ -112,15 +135,18 @@ class Website:
     # Cleans out HTML markup data. When seperating out the split data, returns in form of array of strings.
     # Also removes 'invisible' chars and others that can be problematic due to UTF limitations. WHEN WILL WE LEARN?
     def clean_out_markup(marked_text):
-        list = Website.remove_between(marked_text, '<','>').split('<>') #clears out tags
-        while '' in list:
-            list.remove('') #remove empty lines
-        for index, item in enumerate(list):
+        tagless_list = Website.remove_between(marked_text, '<','>').split('<>') #clears out tags
+        tagless_list = list(filter(None, Website.remove_whitespace_strings(tagless_list)))
+        for index, item in enumerate(tagless_list):
             item = item.replace("&nbsp;","") # nonbreaking space
             item = item.replace('u200b',"")
-            item = item.replace('●',"") # causes weird issues when viewed in Excel
-            list[index] = item 
-        return list
+            item = item.replace('●',"")
+            item = item.replace('•',"")
+            tagless_list[index] = item 
+        return tagless_list
+    
+    def remove_whitespace_strings(string_list):
+        return [s for s in string_list if s.strip()]
     
     # Unfortunately we have to iterate through all the text data and we can't check as we go through. 
     # Job listings have a nasty habit of adding all sorts of ancillary data and dollar amounts and it's just a whole thing. 
@@ -144,10 +170,12 @@ class Website:
 ##################################################### Spreadsheet Methods #####################################################
 
     def write_to_sheet(self, row, web_data, plaintext):
-        self.spreadsheet
         # When this data comes in it has multiple delimiters for the same thing and needs some trimming
         for col, field_name in enumerate(web_data):
-            self.spreadsheet.cell((row), (col+1), web_data[field_name])
+            try:
+                self.spreadsheet.cell((row), (col+1), web_data[field_name].strip("-: "))
+            except:
+                self.spreadsheet.cell((row), (col+1), web_data[field_name])
             # sheet_tab.write(row, col, field_name)
         self.spreadsheet.cell((row), (len(web_data)+1), str(plaintext))
 

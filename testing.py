@@ -1,11 +1,21 @@
 from datetime import date
 import re
+import time
+from progress_bar import ProgressBar
 from website import Website
 
-line ='<p><span style="font-weight: bold;"><span>Category: Systems Administrator</span><br><span>Travel Required:&nbsp;No</span><br><span>Remote Type: No</span><br><span>Clearance: TS/SCI w/ Polygraph </span></span></p>'
+# Print iterations progress
+progressBar = ProgressBar()
 
-line = '<div class="careers-info col"><div class="job-reqs-icon-container" aria-label="Clearance Level icon"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 28 32" alt=""><path fill="#0C0F19" fill-rule="evenodd" d="M14.8 3.6c-.5-.4-1.2-.4-1.6 0l-9.8 7.7v9.4l9.8 7.7c.5.4 1.2.4 1.6 0l9.8-7.7v-7l-9.8 8.7c-.5.4-1.3.4-1.8 0l-6-5.3c-.6-.5-.6-1.3-.1-1.9s1.3-.6 1.9-.1l5.1 4.5L25 9.7c.4-.3 1-.4 1.4-.2.5.2.8.7.8 1.2v10c0 .8-.4 1.6-1 2.1l-9.8 7.7c-1.4 1.1-3.5 1.1-4.9 0l-9.8-7.7c-.6-.5-1-1.3-1-2.1v-9.4c0-.8.4-1.6 1-2.1l9.8-7.7c1.4-1.1 3.5-1.1 4.9 0l4.4 3.4c.6.5.7 1.3.2 1.9s-1.3.7-1.9.2z" clip-rule="evenodd"></path></svg></div><span class="h8 careers-label">Clearance Level</span><div>Top Secret SCI + Polygraph</div></div><div class="careers-info col"><div class="job-reqs-icon-container" aria-label="Category icon"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 30 32" alt=""><path fill="#0C0F19" fill-rule="evenodd" d="M8.3 0c-2.2 0-4 1.8-4 4v5.3c-2.2 0-4 1.8-4 4V28c0 2.2 1.8 4 4 4h21.3c2.2 0 4-1.8 4-4V13.3c0-2.2-1.8-4-4-4V4c0-2.2-1.8-4-4-4zM23 9.3V4c0-.7-.6-1.3-1.3-1.3H8.3C7.6 2.7 7 3.3 7 4v5.3zM4.3 12c-.7 0-1.3.6-1.3 1.3v4.4l2.8.7v-1.1c0-1.4 1.1-2.5 2.5-2.5H11c1.4 0 2.5 1.1 2.5 2.5v1.5h2.9v-1.5c0-1.4 1.1-2.5 2.5-2.5h2.7c1.4 0 2.5 1.1 2.5 2.5v1.1l2.8-.7v-4.4c0-.7-.6-1.3-1.3-1.3zM3 20.2l2.8.7v1.7c0 1.4 1.1 2.5 2.5 2.5H11c1.4 0 2.5-1.1 2.5-2.5v-1.5h2.9v1.5c0 1.4 1.1 2.5 2.5 2.5h2.7c1.4 0 2.5-1.1 2.5-2.5v-1.7l2.8-.7V28c0 .7-.6 1.3-1.3 1.3H4.3c-.7 0-1.3-.6-1.3-1.3zm5.3-3c-.1 0-.1.1-.1.1v5.3c0 .1.1.1.1.1H11c.1 0 .1-.1.1-.1v-5.3c0-.1-.1-.1-.1-.1zm10.6.1c0-.1.1-.1.1-.1h2.7c.1 0 .1.1.1.1v5.3c0 .1-.1.1-.1.1H19c-.1 0-.1-.1-.1-.1z" clip-rule="evenodd"></path></svg></div><span class="h8 careers-label">Category</span><div class="jobCategory">Systems Engineering</div></div><div class="careers-info col"><div class="job-reqs-icon-container" aria-label="Location icon"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 28 32" alt=""><path fill="#474A4C" fill-rule="evenodd" d="M14 3.1C8.1 3.1 3.3 7.8 3.3 13.7c0 1 .3 2.2 1 3.5.7 1.4 1.6 2.9 2.7 4.3 2.1 2.8 4.6 5.4 6.2 7 .5.4 1.1.4 1.6 0 1.6-1.6 4.2-4.2 6.2-7 1-1.4 2-2.8 2.6-4.2.7-1.4 1-2.6 1-3.5.1-6-4.7-10.7-10.6-10.7M.7 13.7C.7 6.3 6.7.4 14 .4c7.4 0 13.3 6 13.3 13.3 0 1.5-.5 3.2-1.3 4.7-.8 1.6-1.8 3.1-2.9 4.6-2.2 3-4.8 5.7-6.5 7.3-1.5 1.5-3.8 1.5-5.3 0C9.7 28.7 7 26 4.8 23.1c-1.1-1.5-2.1-3.1-2.9-4.6-.7-1.6-1.2-3.2-1.2-4.8M14 11.1c-1.5 0-2.7 1.2-2.7 2.7s1.2 2.7 2.7 2.7 2.7-1.2 2.7-2.7-1.2-2.7-2.7-2.7m-5.3 2.6c0-2.9 2.4-5.3 5.3-5.3s5.3 2.4 5.3 5.3S16.9 19 14 19c-2.9.1-5.3-2.3-5.3-5.3" clip-rule="evenodd"></path></svg></div><span class="h8 careers-label">Location</span><div>Chantilly, Virginia</div><i>(<!-- -->Onsite Workplace<!-- -->)</i></div><div class="careers-info careers-action col"><a href="https://gdit.wd5.myworkdayjobs.com/External_Career_Site/job/USA-VA-Chantilly/Windows-Systems-Packaging-Engineer---TS-SCI-with-Polygraph_RQ193861/apply?source=AutoAppend_GoogleOrganicSearch" target="_blank" class="square square-inverted" role="button">Apply Now</a></div>'
-line = 'Windows Systems/Packaging Engineer - TS/SCI with Polygraph'
-print(Website.clean_out_markup(line))
+# A List of Items
+items = list(range(0, 57))
+l = len(items)
 
-print(f'{date.today()}hooplah')
+progressBar.refresh(0,57, prefix = 'GDIT Progress:', suffix = 'Collecting Job Postings')
+for i, item in enumerate(items):
+    # Do stuff...
+    time.sleep(0.1)
+    # Update Progress Bar
+    progressBar.refresh(i, 0, prefix = 'GDIT Progress:', suffix = 'Collecting Job Postings')
+
+print()

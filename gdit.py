@@ -1,4 +1,5 @@
 import time
+from progress_bar import ProgressBar
 from website import Website
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -12,19 +13,20 @@ class GDIT(Website):
     # 2: Pulls all jobs globally. Not ideal. filter DMV only somehow.
     # 3: Job data comes out super weird. 
     
-    def process(self):
-        job_postings = self.get_job_postings()
-        self.driver.set_page_load_timeout(5)
-        for index, job_page in enumerate(job_postings):
-            try:
-                job_data, plaintext_data = self.process_job_page(job_page)
-                job_data.update()
-                self.write_to_sheet(index+2, job_data, plaintext_data)
-            except Exception as e:
-                print(f"Fail on webpage, might be worth looking into.  {job_page}")
-                print(e)
-                continue
-        return 0
+    # def process(self):
+    #     job_postings = self.get_job_postings()
+    #     self.driver.set_page_load_timeout(5)
+    #     num_jobs = len(job_postings)
+    #     for index, job_page in enumerate(job_postings):
+    #         try:
+    #             job_data, plaintext_data = self.process_job_page(job_page)
+    #             self.write_to_sheet(index+2, job_data, plaintext_data)
+    #             self.progress_bar.refresh(index, num_jobs)
+    #         except Exception as e:
+    #             print(f"Fail on webpage, might be worth looking into.  {job_page}")
+    #             print(e)
+    #             continue
+    #     return 0
     
     #Iterates through all the website pages
     def get_job_postings(self):
@@ -44,6 +46,7 @@ class GDIT(Website):
             #This is a bit of a caveman solution, we iterate until we don't find any new jobs to add.
             if(old_value != len(job_set)):
                 old_value = len(job_set)
+                self.progress_bar.refresh(0, old_value)
             else:
                 break
             next_page_button.click()
