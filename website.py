@@ -14,6 +14,7 @@ class Website:
 
     def __init__(self, driver, workbook, sheet_name, webconfig_data):
         self.driver = driver
+        self.algo_name = sheet_name
         self.spreadsheet = workbook.create_sheet(sheet_name,0)
         self.workbook = workbook
         self.webconfig_data = webconfig_data
@@ -61,6 +62,7 @@ class Website:
 
     #process through the website pages, format data, write to sheet
     def run(self):
+        print(f"Creating {self.algo_name} spreadsheet; gathering job postings")
         job_postings = self.get_job_postings()
         num_jobs = len(job_postings)
         self.driver.set_page_load_timeout(5)

@@ -1,0 +1,51 @@
+
+{
+    "URL":"https://www.akina-inc.com/careers/",
+
+    "page_elements":
+        {
+            "next_page_button": "//*[@class=\"next_page\"]",
+            "job_description_data_css": ".job-data",
+            "listing_page_job_row_css":".cats-job",
+            "header_css": ".heading-2",
+            "careers": "//a[contains(@href,\"catsone.com/careers/\")]",
+            "textbox_css": ".job-description-outer"
+        },
+
+        "fields": 
+        {
+            "URL":"",
+            "Payband":"",
+            "Job #":"<multiline>Job #:",
+            "LCAT":"",
+            "Remote":"<multiline>Remote Type:", 
+            "Clearance":"<multiline>Clearance",
+            "Location":"<multiline>Location:",
+            "Travel":"<multiline>Travel Required:",
+            "Sector":"<multiline>Sector:",
+            "Schedule":"<multiline>Schedule (FT/PT):",
+            "External Referral Eligable:":"<multiline>External Referral Program",
+            "Referral Bonus":"<multiline>Referral Bonus Amount",
+            "Job Category":"<multiline>Category:",
+            "Description":"<multiline>Responsibilities:",
+            "Description1":"<multiline>Key Responsibilities",
+            "Description2":"<multiline>Primary Responsibilities",
+            "Description3":"<multiline>What You'll Be Doing:",
+            "Description5":"<multiline>Description:",
+            "Description6":"<multiline>Job Description", 
+            "Description7":"<multiline>Looking for an opportunity to make an impact?",
+            "Requirements":"<multiline>Basic Qualifications",
+            "Requirements1":"<multiline>Desired Qualifications",
+            "Requirements11":"<multiline>Preferred Qualifications",
+            "Requirements2":"<multiline>Qualifications:",
+            "Requirements3":"<multiline>Desired Skills", 
+            "Requirements31":"<multiline>Desirable Skills ",
+            "Requirements32":"<multiline>Desired Experience",
+            "Requirements4":"<multiline>Required Skills",
+            "Requirements5":"<multiline>What You Need To Have", 
+            "Requirements6":"<multiline>Certifications:",
+            "Requirements7":"<multiline>following capabilities:",
+            "Requirements8":"<multiline>EXPERIENCE:",
+            "Requirements9":"<multiline>Required Experience, Skills, and Education:" 
+        }
+}
