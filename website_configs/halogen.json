@@ -1,34 +1,37 @@
 
 {
-    "URL":"https://www.akina-inc.com/careers/",
+    "URL":"https://halogeneng.com/careers/",
 
     "page_elements":
         {
-            "next_page_button": "//*[@class=\"next_page\"]",
+            "next_page_button": "awsm-load-more",
             "job_description_data_css": ".job-data",
-            "listing_page_job_row_css":".cats-job",
+            "listing_page_job_row_class":"awsm-job-item",
             "header_css": ".heading-2",
-            "careers": "//a[contains(@href,\"catsone.com/careers/\")]",
-            "textbox_css": ".sc-caSCKo"
+            "careers": "//a[contains(@href,\"jobs/\")]",
+            "textbox_css": ".awsm-job-content",
+            "row_opening_number":"awsm-job-specification-item awsm-job-specification-opening-number"
+
         },
 
         "fields": 
         {
             "URL":"",
             "Payband":"",
-            "Job #":"<multiline>Job ID",
+            "Contract":"",
+            "Job #":"",
             "LCAT":"<multiline>www.akina-inc.com/careers",
             "Remote":"<multiline>Remote Type:", 
-            "Clearance":"<multiline>Clearance",
+            "Clearance":"Clearance",
             "Location":"<multiline>Location", 
             "Travel":"<multiline>Travel Required:",
-            "Schedule":"<multiline>Schedule (FT/PT):",
-            "Job Category":"<multiline>Position Type",
+            "Schedule":"",
+            "Job Category":"",
             "Description":"<multiline>Responsibilities:",
             "Description1":"<multiline>Key Responsibilities",
             "Description2":"<multiline>Primary Responsibilities",
             "Description3":"<multiline>What You'll Be Doing:",
-            "Description5":"<multiline>Description:",
+            "Description5":"<multiline>Position Overview:",
             "Description6":"<multiline>Job Description", 
             "Requirements":"<multiline>Basic Qualifications",
             "Requirements1":"<multiline>Desired Qualifications",
@@ -37,10 +40,10 @@
             "Requirements3":"<multiline>Desired Skills", 
             "Requirements31":"<multiline>Desirable Skills ",
             "Requirements32":"<multiline>Desired Experience",
-            "Requirements4":"<multiline>Required Skills",
+            "Requirements4":"<multiline>",
             "Requirements5":"<multiline>What You Need To Have", 
             "Requirements6":"<multiline>Certifications:",
             "Requirements7":"<multiline>following capabilities:",
-            "Requirements9":"<multiline>Required Experience, Skills, and Education:" 
+            "Requirements9":"<multiline>Required Experience:" 
         }
 }

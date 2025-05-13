@@ -20,7 +20,6 @@ class Parsons(Website):
 
     def process_job_page(self, job_page):
         self.driver.get(job_page)
-        print(f"   {job_page}")
         self.wait(self.page_elements['header'], By.CSS_SELECTOR) #ensure page text loads
         plaintext_job_data = []
         raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()

@@ -1,12 +1,14 @@
 import re
+import sys
 import time
+import traceback
 from progress_bar import workbook_name
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-
+from bs4 import BeautifulSoup
 from progress_bar import ProgressBar
 
 
@@ -72,8 +74,10 @@ class Website:
                 self.write_to_sheet(index+2, job_data, plaintext_data)
                 self.progress_bar.refresh(index, num_jobs)
             except Exception as e:
-                print(f"Fail on webpage, might be worth looking into.  {job_page}")
-                print(e)
+                print(f"Fail on webpage:  {job_page}")
+                print(f"Exception: {type(e).__name__} - {e}")
+                print("Stack Trace:")
+                traceback.print_exc(file=sys.stdout) #todo: error file
                 continue
             if(index%25 == 0):
                 self.workbook.save(workbook_name)
@@ -131,7 +135,7 @@ class Website:
     
     #Process some fun things like regex and all that
     def process_special(self, job_data, plaintext_array):
-        job_data.update(Website.find_pay_band(plaintext_array))
+        job_data.update(self.find_pay_band(plaintext_array))
         return job_data
 
     # Cleans out HTML markup data. When seperating out the split data, returns in form of array of strings.
@@ -160,14 +164,17 @@ class Website:
     #     \d+: Matches one or more digits.
     #     (?:,\d{3})*: Matches zero or more occurrences of a comma followed by three digits (for thousands separators).
     #     (?:\.\d+)?: Matches an optional decimal point followed by one or more digits.
+    # Second one is the same except it finds fillar amounts in teh format $245k
     # And we want multiple dollar amounts to capture ranges if they happen
-    def find_pay_band(raw_data_array) -> {str,str}:
+    def find_pay_band(self, raw_data_array) -> {str,str}:
+        pay_array = []
         for row in raw_data_array:
-            if ('$' in row) and (',' in row):
-                lower = row.lower()
+            lower = row.lower()
+            if ('$' in row) and (',' in row) and ((not "bonus" in lower) and (not 'sign-on' in lower)):
                 if (not "bonus" in lower) and (not 'sign-on' in lower):
-                    return {"Payband":str(['$'+str(amount) for amount in re.findall(r'\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)', row)])}
-        return {"Payband":""}
+                    pay_array += ['$'+str(amount) for amount in re.findall(r'\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)', row)]
+                    pay_array += [str(amount) for amount in re.findall(r'\$\d+(?:\.\d+)?k\s*-\s*\$\d+(?:\.\d+)?k\b', row)]
+        return {"Payband":str(pay_array)}
 
 ##################################################### Spreadsheet Methods #####################################################
 

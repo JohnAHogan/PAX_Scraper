@@ -10,9 +10,8 @@ from websitefactory import WebsiteFactory
 ##################################################### Main Method #####################################################
 def main():
     options = webdriver.FirefoxOptions()
-    # options.add_argument("-headless")
+    options.add_argument("-headless")
 
-    #This firefox profile defeats CloudFlare.....usually. Continued testing might lead to issues.
     firefox_profile = FirefoxProfile()
     firefox_profile.set_preference("javascript.enabled", True)
     options.profile = firefox_profile

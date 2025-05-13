@@ -7,6 +7,7 @@ import os
 from akina import Akina
 from gdit import GDIT
 from grayband import Grayband
+from halogen import Halogen
 from leidos import Leidos
 from parsons import Parsons
 from sunayu import Sunayu
@@ -18,13 +19,13 @@ from progress_bar import workbook_name
 
 class WebsiteFactory:
 
-    sunayu_toggle = False
-    parsons_toggle = False
-    grayband_toggle = False
-    gdit_toggle = False
-    leidos_toggle = False
+    sunayu_toggle = True
+    parsons_toggle = True
+    grayband_toggle = True
+    gdit_toggle = True
+    leidos_toggle = True
     akina_toggle = True
-    _toggle = False
+    halogen_toggle = True
 
     def run_algorithm(self, driver, workbook, config_path):
         filename = os.fsdecode(config_path)
@@ -50,7 +51,10 @@ class WebsiteFactory:
                 driver2.quit()
             elif "akina" in filename and self.akina_toggle:
                 Akina(driver, workbook, 'Akina', json.load(open(config_path))).run()
-                
+            elif "halogen" in filename and self.halogen_toggle:
+                Halogen(driver, workbook, "Halogen", json.load(open(config_path))).run()
+            elif "lockheed" in filename:
+                pass
             else:
                 print(f"Choosing not to run algorithm related to config file {filename}")
         else:
