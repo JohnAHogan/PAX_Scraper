@@ -19,7 +19,7 @@
             "Location":"Location:",
             "Travel":"Travel Required:",
             "Full/Part Time":"Employment Type:",
-            "Opening Type":"Remote Type:",
+            "Remote":"Remote Type:",
             "Description":"<multiline>Job Summary",
             "Description1":"<multiline>Key Responsibilities",
             "Description2":"<multiline>Primary Responsibilities",
