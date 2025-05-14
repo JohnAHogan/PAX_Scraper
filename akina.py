@@ -23,7 +23,7 @@ class Akina(Website):
         links = self.driver.find_elements(By.XPATH, self.page_elements['careers'])
         job_reference = [el.get_attribute('href') for el in links]
         row_elements = self.driver.find_elements(By.CSS_SELECTOR, self.page_elements['listing_page_job_row_css'])
-        job_postings = [JobPosting]
+        job_postings = []
         for ref, elem in zip(job_reference, row_elements):
             job_postings.append(JobPosting(ref, elem))
         return set(job_postings)
@@ -37,7 +37,7 @@ class Akina(Website):
         self.wait(self.page_elements['textbox_css'], By.CSS_SELECTOR) #ensure page text loads
         plaintext_job_data = []
         raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox_css']).get_attribute("innerHTML").splitlines()
-        raw_lines += Job_Data.get_data()
+        raw_lines += Job_Data.get_data().splitlines()
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
@@ -48,12 +48,3 @@ class Akina(Website):
     
     def process_outside_text(self, job_data):
         return job_data
-    
-    # Defeating engineers with jank HTML data
-    def find_pay_band(self, raw_data_array) -> {str,str}:
-        for row in raw_data_array:
-            if ('$' in row):
-                lower = row.lower()
-                if (not "bonus" in lower) and (not 'sign-on' in lower):
-                    return {"Payband":str([str(amount) for amount in re.findall(r'\$\d+(?:\.\d+)?k\s*-\s*\$\d+(?:\.\d+)?k\b', row)])}
-        return {"Payband":""}

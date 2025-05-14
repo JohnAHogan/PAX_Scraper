@@ -24,7 +24,7 @@ class WebsiteFactory:
     grayband_toggle = True
     gdit_toggle = True
     leidos_toggle = True
-    akina_toggle = True
+    akina_toggle = False
     halogen_toggle = True
 
     def run_algorithm(self, driver, workbook, config_path):

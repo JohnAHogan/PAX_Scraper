@@ -57,20 +57,7 @@ class Halogen(Website):
         job_data = self.process_special(job_data, plaintext_job_data)
         job_data = self.process_outside(job_data, Job_Data.get_data())
         job_data.update({"URL":Job_Data.get_URL()})
-        job_data.update({"Clearance":plaintext_job_data[0]})
         return Website.correct_columns(job_data), plaintext_job_data # remove key duplicates
-    
-    def process_outside_text(self, job_data):
-        return job_data
-    
-    # Defeating engineers with jank HTML data
-    def find_pay_band(self, raw_data_array) -> {str,str}:
-        for row in raw_data_array:
-            if ('$' in row):
-                lower = row.lower()
-                if (not "bonus" in lower) and (not 'sign-on' in lower):
-                    return {"Payband":str([str(amount) for amount in re.findall(r'\$\d+(?:\.\d+)?k\s*-\s*\$\d+(?:\.\d+)?k\b', row)])}
-        return {"Payband":""}
     
     def process_outside(self, job_data, html_soup):
         soup = BeautifulSoup(html_soup, 'html.parser')

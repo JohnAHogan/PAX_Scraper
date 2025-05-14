@@ -1,4 +1,5 @@
 import time
+from typing import List
 from website import Website
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -34,6 +35,7 @@ class Leidos(Website):
                 next_page_button[-1].click()
             except:
                 break
+            break
         return job_set
     
 
@@ -43,9 +45,7 @@ class Leidos(Website):
         self.wait(self.page_elements['header_css'], By.CSS_SELECTOR) #ensures page text loads.
         
         raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox_css']).get_attribute("innerHTML").splitlines()
-        for raw_line in raw_lines:
-            plaintext_job_data += Website.clean_out_markup(raw_line)
-        raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_data_css']).get_attribute("innerHTML").splitlines()
+        raw_lines += self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_data_css']).get_attribute("innerHTML").splitlines()
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
 

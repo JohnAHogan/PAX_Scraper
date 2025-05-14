@@ -36,12 +36,13 @@ class Parsons(Website):
         job_row = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_row']).get_attribute("innerHTML")
         job_row = Website.clean_out_markup(job_row)
         try:
+            print(job_row)
             job_data.update({'Location':job_row[0]})
             job_data.update({'Requisition ID':job_row[1]})
             job_data.update({'Clearance':job_row[3]})
         except:
-            #we dont really do anything here. The data is inconsistent on 0.1% of pages for some reason. Legacy?
-            print("Error parsing jobs row on Parsons site. ")
+            pass
+
         job_title = Website.clean_out_markup(self.driver.find_element(By.CSS_SELECTOR, self.page_elements['header']).get_attribute("innerHTML"))
         # print(job_title)
         job_data.update({'LCAT':job_title[0]})

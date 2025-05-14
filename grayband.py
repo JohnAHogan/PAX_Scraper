@@ -44,12 +44,3 @@ class Grayband(Website):
     def process_special(self, job_data, plaintext_array):
         job_data.update(Grayband.find_pay_band(plaintext_array))
         return job_data
-
-    # Defeating engineers with jank HTML data
-    def find_pay_band(raw_data_array) -> {str,str}:
-        for row in raw_data_array:
-            if ('$' in row):
-                lower = row.lower()
-                if (not "bonus" in lower) and (not 'sign-on' in lower):
-                    return {"Payband":str([str(amount) for amount in re.findall(r'\$\d+(?:\.\d+)?k\s*-\s*\$\d+(?:\.\d+)?k\b', row)])}
-        return {"Payband":""}

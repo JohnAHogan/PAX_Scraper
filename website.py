@@ -71,7 +71,7 @@ class Website:
         for index, job_page in enumerate(job_postings):
             try:
                 job_data, plaintext_data = self.process_job_page(job_page)
-                self.write_to_sheet(index+2, job_data, plaintext_data)
+                self.write_to_sheet(index+2, job_data, Website.remove_whitespace_strings(plaintext_data))
                 self.progress_bar.refresh(index, num_jobs)
             except Exception as e:
                 print(f"Fail on webpage:  {job_page}")
@@ -138,18 +138,14 @@ class Website:
         job_data.update(self.find_pay_band(plaintext_array))
         return job_data
 
+
+    garbage_text = ["&nbsp;", "u200b", "●", "•", '\xa0', ]
+    pattern = "|".join(map(re.escape, garbage_text))
     # Cleans out HTML markup data. When seperating out the split data, returns in form of array of strings.
     # Also removes 'invisible' chars and others that can be problematic due to UTF limitations. WHEN WILL WE LEARN?
     def clean_out_markup(marked_text):
-        tagless_list = Website.remove_between(marked_text, '<','>').split('<>') #clears out tags
-        tagless_list = list(filter(None, Website.remove_whitespace_strings(tagless_list)))
-        for index, item in enumerate(tagless_list):
-            item = item.replace("&nbsp;","") # nonbreaking space
-            item = item.replace('u200b',"")
-            item = item.replace('●',"")
-            item = item.replace('•',"")
-            tagless_list[index] = item 
-        return tagless_list
+        soup = BeautifulSoup(marked_text, 'html.parser').get_text() + " "
+        return [re.sub(Website.pattern, "", soup)]
     
     def remove_whitespace_strings(string_list):
         return [s for s in string_list if s.strip()]
@@ -182,9 +178,9 @@ class Website:
         # When this data comes in it has multiple delimiters for the same thing and needs some trimming
         for col, field_name in enumerate(web_data):
             try:
-                self.spreadsheet.cell((row), (col+1), web_data[field_name].strip("-: "))
+                self.spreadsheet.cell((row), (col+1), str(web_data[field_name].strip("-: ")))
             except:
-                self.spreadsheet.cell((row), (col+1), web_data[field_name])
+                self.spreadsheet.cell((row), (col+1), str(web_data[field_name]))
             # sheet_tab.write(row, col, field_name)
         self.spreadsheet.cell((row), (len(web_data)+1), str(plaintext))
 
@@ -194,7 +190,7 @@ class Website:
         for key_val in duplicative_dict:
             key = re.sub(r"\d", "", f"{key_val}") #regex remove all integers from string
             val = duplicative_dict[key_val]
-            if(key in corrected_dict):
+            if val and(key in corrected_dict):
                 val += corrected_dict[key]
             corrected_dict.update({key:val})
         return corrected_dict
