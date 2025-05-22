@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 from progress_bar import ProgressBar
+from openpyxl.styles import Font, PatternFill
 
 
 class Website:
@@ -24,6 +25,9 @@ class Website:
         self.progress_bar = ProgressBar()
         for col, field_name in enumerate(Website.correct_columns(webconfig_data['fields'])):
             self.spreadsheet.cell(1, (col+1), field_name)
+        for cell in self.spreadsheet["1:1"]:
+            cell.font = Font(name="Calibri", color="FFFFFF", bold=True)
+            cell.fill = PatternFill(fill_type="solid", start_color="0000FF", end_color="0000FF")
 
 ##################################################### Selenium Helper Methods #####################################################
 
@@ -94,7 +98,7 @@ class Website:
         return -1
     
     def get_next_delimiter_row(self, start_row, raw_data):
-        for index in range(start_row+1, len(raw_data)):
+        for index in range(start_row+1+1, len(raw_data)):
             if self.contains_delimiter(raw_data[index]):
                 return index
         return len(raw_data)
@@ -113,13 +117,15 @@ class Website:
         if "<multiline>" in delimiter:
             multirow_data = ""
             delimiter2 = delimiter.replace("<multiline>", "")
+            if delimiter2 == "" :
+                return ""
             start_delimiter_row = Website.get_row_of_delimiter(raw_data,  delimiter2)
             if start_delimiter_row == -1:
                 return ""
             else:
                 next_delimiter_row = self.get_next_delimiter_row(start_delimiter_row, raw_data)
                 for i in range(start_delimiter_row+1, next_delimiter_row):
-                    multirow_data += raw_data[i] + " -"
+                    multirow_data += raw_data[i] + " "
                 return multirow_data
         else:
             for row in raw_data:
@@ -143,9 +149,22 @@ class Website:
     pattern = "|".join(map(re.escape, garbage_text))
     # Cleans out HTML markup data. When seperating out the split data, returns in form of array of strings.
     # Also removes 'invisible' chars and others that can be problematic due to UTF limitations. WHEN WILL WE LEARN?
+    # def clean_out_markup(marked_text):
+    #     soup = BeautifulSoup(marked_text, 'html.parser').get_text() + " "
+    #     return [re.sub(Website.pattern, "", soup)]
+    
+
     def clean_out_markup(marked_text):
-        soup = BeautifulSoup(marked_text, 'html.parser').get_text() + " "
-        return [re.sub(Website.pattern, "", soup)]
+        tagless_list = Website.remove_between(marked_text, '<','>').split('<>') #clears out tags
+        tagless_list = list(filter(None, Website.remove_whitespace_strings(tagless_list)))
+        for index, item in enumerate(tagless_list):
+            item = item.replace("&nbsp;","") # nonbreaking space
+            item = item.replace('u200b',"")
+            item = item.replace('●',"")
+            item = item.replace('•',"")
+            tagless_list[index] = item 
+        return tagless_list
+
     
     def remove_whitespace_strings(string_list):
         return [s for s in string_list if s.strip()]
@@ -166,10 +185,10 @@ class Website:
         pay_array = []
         for row in raw_data_array:
             lower = row.lower()
-            if ('$' in row) and (',' in row) and ((not "bonus" in lower) and (not 'sign-on' in lower)):
+            if ('$' in row) and ((not "bonus" in lower) and (not 'sign-on' in lower)):
                 if (not "bonus" in lower) and (not 'sign-on' in lower):
-                    pay_array += ['$'+str(amount) for amount in re.findall(r'\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)', row)]
-                    pay_array += [str(amount) for amount in re.findall(r'\$\d+(?:\.\d+)?k\s*-\s*\$\d+(?:\.\d+)?k\b', row)]
+                    pay_array += ['$'+str(amount) for amount in re.findall(r"\$([0-9]{1,3}(?:,[0-9]{3})+|\d+)(?:\.\d{2})?", row)]
+                    # pay_array += [str(amount) for amount in re.findall(r"\$((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|(?:\d+(?:\.\d+)?)[kK])", row)]
         return {"Payband":str(pay_array)}
 
 ##################################################### Spreadsheet Methods #####################################################
@@ -190,8 +209,9 @@ class Website:
         for key_val in duplicative_dict:
             key = re.sub(r"\d", "", f"{key_val}") #regex remove all integers from string
             val = duplicative_dict[key_val]
-            if val and(key in corrected_dict):
-                val += corrected_dict[key]
+            if not val:
+                if(key in corrected_dict):
+                    val += corrected_dict[key]
             corrected_dict.update({key:val})
         return corrected_dict
 

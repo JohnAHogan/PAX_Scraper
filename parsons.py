@@ -23,7 +23,6 @@ class Parsons(Website):
         self.wait(self.page_elements['header'], By.CSS_SELECTOR) #ensure page text loads
         plaintext_job_data = []
         raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox']).get_attribute("innerHTML").splitlines()
-        # print(raw_lines)
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)
@@ -36,7 +35,6 @@ class Parsons(Website):
         job_row = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['job_description_row']).get_attribute("innerHTML")
         job_row = Website.clean_out_markup(job_row)
         try:
-            print(job_row)
             job_data.update({'Location':job_row[0]})
             job_data.update({'Requisition ID':job_row[1]})
             job_data.update({'Clearance':job_row[3]})
@@ -44,6 +42,5 @@ class Parsons(Website):
             pass
 
         job_title = Website.clean_out_markup(self.driver.find_element(By.CSS_SELECTOR, self.page_elements['header']).get_attribute("innerHTML"))
-        # print(job_title)
         job_data.update({'LCAT':job_title[0]})
         return job_data

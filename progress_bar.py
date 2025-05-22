@@ -28,6 +28,7 @@ class ProgressBar:
         color = ProgressBar.get_color(percent)
         filledLength = int(self.length * iteration // total)
         bar = color + self.fill * filledLength + self.white + self.empty * (self.length - filledLength)
+        
         print(f'\r{prefix} [{bar}] {iteration}/{total} {suffix}', end = self.printEnd)
         # Print New Line on Complete
         if iteration == total:

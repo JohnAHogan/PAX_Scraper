@@ -18,8 +18,6 @@
             "Requisition ID":"",
             "LCAT":"",
             "Status":"",
-            "Contact Name":"",
-            "Contact Email":"",
             "Clearance":"",
             "Reason for Opening":"",
             "Location":"",
@@ -28,8 +26,6 @@
             "Full/Part Time":"Employment Type:",
             "Legacy Department":"",
             "Remote":"Remote Type:",
-            "Need by Date":"",
-            "Project Name":"",
             "Description":"<multiline>Responsibilities include, but are not limited to",
             "Description1":"<multiline>Key Responsibilities",
             "Description2":"<multiline>Primary Responsibilities",
@@ -40,6 +36,7 @@
             "Requirements2":"<multiline>Qualifications:",
             "Requirements3":"<multiline>Desired Skills",
             "Requirements4":"<multiline>Required Skills",
-            "Requirements5":"<multiline>What You Need To Have"
+            "Requirements5":"<multiline>What You Need To Have",
+            "Requirements6":"<multiline>What Required Skills You'll Bring:"
         }
 }

@@ -19,29 +19,34 @@ from progress_bar import workbook_name
 
 class WebsiteFactory:
 
-    sunayu_toggle = True
-    parsons_toggle = True
-    grayband_toggle = True
-    gdit_toggle = True
-    leidos_toggle = True
-    akina_toggle = False
-    halogen_toggle = True
+    def __init__(self, tk):
+        self.tk = tk
+
+
+    # sunayu_toggle = False
+    # parsons_toggle = False
+    # grayband_toggle = False
+    # gdit_toggle = False
+    # leidos_toggle = False
+    # akina_toggle = False
+    # halogen_toggle = False
 
     def run_algorithm(self, driver, workbook, config_path):
         filename = os.fsdecode(config_path)
         if filename.endswith(".json"):
-            if "sunayu" in filename and self.sunayu_toggle:
+            if "sunayu" in filename and self.tk.sunayu_toggle.get():
                 Sunayu(driver, workbook, 'Sunayu', json.load(open(config_path))).run()
-            elif "parsons" in filename and self.parsons_toggle:
+            elif "parsons" in filename and self.tk.parsons_toggle.get():
                 Parsons(driver, workbook, "Parsons", json.load(open(config_path))).run()
-            elif "grayband" in filename and self.grayband_toggle:
+            elif "grayband" in filename and self.tk.grayband_toggle.get():
                 Grayband(driver, workbook, 'Grayband', json.load(open(config_path))).run()
-            elif "gdit" in filename and self.gdit_toggle:
+            elif "gdit" in filename and self.tk.gdit_toggle.get():
                 GDIT(driver, workbook, 'GDIT', json.load(open(config_path))).run()
-            elif ("leidos" in filename) and self.leidos_toggle:
+            elif ("leidos" in filename) and self.tk.leidos_toggle.get():
                 #todo: figure out how to elegantly add more drivers to this factory
                 options = webdriver.FirefoxOptions()
-                options.add_argument("-headless")
+                if self.tk.headless_toggle.get():
+                    options.add_argument("-headless")
                 #This firefox profile defeats CloudFlare.....usually. Continued testing might lead to issues.
                 firefox_profile = FirefoxProfile()
                 firefox_profile.set_preference("javascript.enabled", False)
@@ -49,9 +54,9 @@ class WebsiteFactory:
                 driver2 = webdriver.Firefox(options)
                 Leidos(driver2, workbook, 'Leidos', json.load(open(config_path))).run()
                 driver2.quit()
-            elif "akina" in filename and self.akina_toggle:
+            elif "akina" in filename and self.tk.akina_toggle.get():
                 Akina(driver, workbook, 'Akina', json.load(open(config_path))).run()
-            elif "halogen" in filename and self.halogen_toggle:
+            elif "halogen" in filename and self.tk.halogen_toggle.get():
                 Halogen(driver, workbook, "Halogen", json.load(open(config_path))).run()
             elif "lockheed" in filename:
                 pass

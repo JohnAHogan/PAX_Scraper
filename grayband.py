@@ -42,5 +42,5 @@ class Grayband(Website):
     
     #Process some fun things like regex and all that
     def process_special(self, job_data, plaintext_array):
-        job_data.update(Grayband.find_pay_band(plaintext_array))
+        job_data.update(self.find_pay_band(plaintext_array))
         return job_data

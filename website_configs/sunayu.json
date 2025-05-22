@@ -11,8 +11,6 @@
         {
             "URL":"",
             "Payband":"",
-            "Opened Date":"",
-            "Requisition ID":"",
             "LCAT":"Category:",
             "Status":"Open",
             "Clearance":"Clearance:",
@@ -24,7 +22,10 @@
             "Description1":"<multiline>Key Responsibilities",
             "Description2":"<multiline>Primary Responsibilities",
             "Requirements":"<multiline>Position Requirements",
+            "Requirements0":"<multiline>Requirements:",
             "Requirements1":"<multiline>Preferred Certifications",
-            "Requirements2":"<multiline>Qualifications"
+            "Requirements2":"<multiline>Qualifications",
+            "Requirements3":"<multiline>This is you:",
+            "Requirements4":"<multiline>skills:"
         }
 }

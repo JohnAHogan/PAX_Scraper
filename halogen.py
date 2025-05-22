@@ -48,9 +48,6 @@ class Halogen(Website):
         self.wait(self.page_elements['textbox_css'], By.CSS_SELECTOR) #ensure page text loads
         plaintext_job_data = []
         raw_lines = self.driver.find_element(By.CSS_SELECTOR, self.page_elements['textbox_css']).get_attribute("innerHTML").splitlines()
-        dunk = []
-        soup = BeautifulSoup(Job_Data.get_data(), 'html.parser')
-            
         for raw_line in raw_lines:
             plaintext_job_data += Website.clean_out_markup(raw_line)
         job_data = self.process_data(plaintext_job_data)

@@ -35,7 +35,6 @@ class Leidos(Website):
                 next_page_button[-1].click()
             except:
                 break
-            break
         return job_set
     
 

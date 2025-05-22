@@ -1,8 +1,5 @@
 from website import Website
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support import expected_conditions as EC
 
 
 
@@ -20,7 +17,6 @@ class Sunayu(Website):
             del job_postings[0] # link to root, we don't need this
         return set(job_postings)
     
-
     def process_job_page(self, job_page):
         self.driver.get(job_page)
         self.wait(self.page_elements['textbox'], By.ID) #ensure page text loads
