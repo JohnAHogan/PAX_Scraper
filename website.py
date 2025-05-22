@@ -98,7 +98,7 @@ class Website:
         return -1
     
     def get_next_delimiter_row(self, start_row, raw_data):
-        for index in range(start_row+1+1, len(raw_data)):
+        for index in range(start_row+1, len(raw_data)):
             if self.contains_delimiter(raw_data[index]):
                 return index
         return len(raw_data)

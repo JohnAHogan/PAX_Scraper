@@ -1,5 +1,6 @@
 
-import os 
+import os
+import sys 
 from openpyxl import Workbook 
 from progress_bar import workbook_name
 from selenium import webdriver 
@@ -89,7 +90,7 @@ class ScraperGui:
             website_factory.run_algorithm(driver, workbook, os.path.join(folder_prefix, file))
         driver.quit()
         workbook.save(workbook_name)
-        quit()
+        sys.exit()
 
 
 if __name__ == "__main__":
