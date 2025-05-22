@@ -26,7 +26,6 @@ class Website:
         for col, field_name in enumerate(Website.correct_columns(webconfig_data['fields'])):
             self.spreadsheet.cell(1, (col+1), field_name)
         self.spreadsheet.cell(1,len(Website.correct_columns(webconfig_data['fields']))+1, "Full Page Text")
-
         for cell in self.spreadsheet["1:1"]:
             cell.font = Font(name="Calibri", color="FFFFFF", bold=True)
             cell.fill = PatternFill(fill_type="solid", start_color="0000FF", end_color="0000FF")
@@ -189,8 +188,8 @@ class Website:
             lower = row.lower()
             if ('$' in row) and ((not "bonus" in lower) and (not 'sign-on' in lower)):
                 if (not "bonus" in lower) and (not 'sign-on' in lower):
-                    pay_array += ['$'+str(amount) for amount in re.findall(r"\$([0-9]{1,3}(?:,[0-9]{3})+|\d+)(?:\.\d{2})?", row)]
-                    # pay_array += [str(amount) for amount in re.findall(r"\$((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|(?:\d+(?:\.\d+)?)[kK])", row)]
+                    pay_array += [str(amount) for amount in re.findall(r"\$\d{1,3},\d{3}+", row)]
+                    pay_array += [str(amount) for amount in re.findall(r"\$\d+(?:\.\d+)?[kK]", row)]
         return {"Payband":str(pay_array)}
 
 ##################################################### Spreadsheet Methods #####################################################
