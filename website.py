@@ -25,6 +25,8 @@ class Website:
         self.progress_bar = ProgressBar()
         for col, field_name in enumerate(Website.correct_columns(webconfig_data['fields'])):
             self.spreadsheet.cell(1, (col+1), field_name)
+        self.spreadsheet.cell(1,len(Website.correct_columns(webconfig_data['fields']))+1, "Full Page Text")
+
         for cell in self.spreadsheet["1:1"]:
             cell.font = Font(name="Calibri", color="FFFFFF", bold=True)
             cell.fill = PatternFill(fill_type="solid", start_color="0000FF", end_color="0000FF")
